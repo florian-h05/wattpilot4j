@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.github.florian-h05</groupId>
+  <artifactId>wattpilot4j</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+
+  <licenses>
+    <license>
+      <name>Apache License 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.html</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Florian Hotze</name>
+      <email>dev@florianhotze.com</email>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/florian-h05/wattpilot4j.git</connection>
+    <developerConnection>scm:git:https://github.com/florian-h05/wattpilot4j.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/florian-h05/wattpilot4j</url>
+  </scm>
+
+  <properties>
+    <enforcer-plugin.version>3.5.0</enforcer-plugin.version>
+    <spotless.version>2.44.3</spotless.version>
+    <license-plugin.version>2.5.0</license-plugin.version>
+    <java.version>17</java.version>
+    <maven.compiler.release>${java.version}</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>${enforcer-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>enforce-java</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>${java.version}</version>
+                </requireJavaVersion>
+                <requireMavenVersion>
+                  <version>3.9.0</version>
+                </requireMavenVersion>
+              </rules>
+              <failFast>true</failFast>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>${spotless.version}</version>
+        <configuration>
+          <formats>
+            <!-- you can define as many formats as you want, each is independent -->
+            <format>
+              <!-- define the files to apply to -->
+              <includes>
+                <include>.gitattributes</include>
+                <include>.gitignore</include>
+              </includes>
+              <!-- define the steps to apply to those files -->
+              <trimTrailingWhitespace/>
+              <endWithNewline/>
+              <indent>
+                <tabs>true</tabs>
+                <spacesPerTab>4</spacesPerTab>
+              </indent>
+            </format>
+          </formats>
+          <java>
+            <googleJavaFormat>
+              <version>1.25.2</version>
+              <style>AOSP</style>
+              <reflowLongStrings>true</reflowLongStrings>
+              <formatJavadoc>true</formatJavadoc>
+            </googleJavaFormat>
+
+            <importOrder>
+              <wildcardsLast>true</wildcardsLast>
+              <order>\#com.florianhotze.wattpilot,com.florianhotze.wattpilot,java|javax|jakarta,\#</order>
+              <!-- you can use an empty string for all the imports you didn't specify explicitly, '|' to join group without blank line, and '\#` prefix for static imports. -->
+            </importOrder>
+          </java>
+
+          <pom>
+            <sortPom>
+              <expandEmptyElements>false</expandEmptyElements>
+              <indentAttribute>schemaLocation</indentAttribute>
+              <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
+              <sortDependencyExclusions/>
+              <sortDependencyManagement/>
+            </sortPom>
+          </pom>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${license-plugin.version}</version>
+        <configuration>
+          <inceptionYear>2025</inceptionYear>
+          <licenseName>apache_v2</licenseName>
+          <organizationName>Florian Hotze</organizationName>
+          <copyrightOwners>Florian Hotze</copyrightOwners>
+          <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+          <useJavaNoReformatCommentStartTag>false</useJavaNoReformatCommentStartTag>
+          <trimHeaderLine>true</trimHeaderLine>
+          <failOnMissingHeader>true</failOnMissingHeader>
+          <failOnNotUptodateHeader>true</failOnNotUptodateHeader>
+
+          <roots>
+            <root>src/main/java</root>
+            <root>src/test/java</root>
+          </roots>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check-file-header</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
