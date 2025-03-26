@@ -24,7 +24,9 @@ import java.lang.reflect.Field;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Enum for available WebSocket {@link Message} types.
+ * Enum for available WebSocket {@link Message} types. See <a
+ * href="https://github.com/joscha82/wattpilot/blob/main/API.md">joscha82/wattpilot: Wattpilot API
+ * Description</a>.
  *
  * @author Florian Hotze - Initial contribution
  */

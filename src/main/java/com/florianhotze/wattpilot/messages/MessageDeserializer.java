@@ -46,6 +46,8 @@ public class MessageDeserializer implements JsonDeserializer<Message> {
                 MessageType.AUTH_REQUIRED.getSerializedName(), AuthRequiredMessage.class);
         messageHandlers.put(MessageType.AUTH_SUCCESS.getSerializedName(), AuthSuccessMessage.class);
         messageHandlers.put(MessageType.AUTH_ERROR.getSerializedName(), AuthErrorMessage.class);
+        messageHandlers.put(MessageType.FULL_STATUS.getSerializedName(), FullStatusMessage.class);
+        messageHandlers.put(MessageType.DELTA_STATUS.getSerializedName(), DeltaStatusMessage.class);
     }
 
     @Override

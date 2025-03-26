@@ -20,20 +20,20 @@
 package com.florianhotze.wattpilot.dto;
 
 /**
- * Record for device information received through the {@link
- * com.florianhotze.wattpilot.messages.HelloMessage}.
+ * Constants for property keys in the WebSocket API. See <a
+ * href="https://github.com/joscha82/wattpilot/blob/main/API.md">joscha82/wattpilot: Wattpilot API
+ * Description</a>.
  *
- * @param serial serial number of the wall box
- * @param hostname hostname of the wall box
- * @param friendlyName friendly name of the wall box, i.e. what is displayed in the app
- * @param version software version of the wall box
- * @param protocol protocol version
- * @param secured whether the connection has to be authenticated
+ * @author Florian Hotze - Initial contribution
  */
-public record DeviceInfo(
-        String serial,
-        String hostname,
-        String friendlyName,
-        String version,
-        int protocol,
-        boolean secured) {}
+public final class PropertyKeys {
+    private PropertyKeys() {}
+
+    public static final String ALLOW_CHARGING = "alw";
+    public static final String CHARGING_CURRENT = "amp";
+    public static final String CAR_STATE = "car";
+    public static final String FORCE_SINGLE_PHASE = "fsp";
+    public static final String STARTING_POWER = "fst";
+    public static final String LOGIC_MODE = "lmo";
+    public static final String CHARGING_ENERGY = "nrg";
+}

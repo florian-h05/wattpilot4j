@@ -19,11 +19,13 @@
  */
 package com.florianhotze.wattpilot;
 
-import com.florianhotze.wattpilot.dto.DeviceInfo;
+import com.florianhotze.wattpilot.dto.PartialStatus;
 import com.florianhotze.wattpilot.messages.AuthErrorMessage;
 import com.florianhotze.wattpilot.messages.AuthMessage;
 import com.florianhotze.wattpilot.messages.AuthRequiredMessage;
 import com.florianhotze.wattpilot.messages.AuthSuccessMessage;
+import com.florianhotze.wattpilot.messages.DeltaStatusMessage;
+import com.florianhotze.wattpilot.messages.FullStatusMessage;
 import com.florianhotze.wattpilot.messages.HelloMessage;
 import com.florianhotze.wattpilot.messages.Message;
 import com.florianhotze.wattpilot.messages.MessageDeserializer;
@@ -69,10 +71,12 @@ public class WattpilotClient {
     private final WebSocketClient client;
     private Session session;
     private boolean isAuthenticated = false;
-    private DeviceInfo deviceInfo;
+    private WattpilotInfo wattpilotInfo;
+    private final WattpilotStatus wattpilotStatus = new WattpilotStatus();
 
     /**
      * Create a new Fronius Wattpilot client using the given {@link HttpClient}.
+     *
      * @param httpClient the HTTP client to use, allows configuring HTTP settings
      */
     public WattpilotClient(HttpClient httpClient) {
@@ -121,15 +125,25 @@ public class WattpilotClient {
     }
 
     /**
-     * Get the {@link DeviceInfo} of the wall box.
+     * Get the {@link WattpilotInfo} of the wall box.
+     *
      * @return the device info or <code>null</code> if not available yet
      */
-    public DeviceInfo getDeviceInfo() {
-        return deviceInfo;
+    public WattpilotInfo getDeviceInfo() {
+        return wattpilotInfo;
     }
 
     /**
-     * Established the WebSocket connection with the wall box.
+     * Get the current status of the wall box.
+     *
+     * @return the current status
+     */
+    public WattpilotStatus getStatus() {
+        return wattpilotStatus;
+    }
+
+    /**
+     * Establishes the WebSocket connection with the wall box.
      *
      * @param host the hostname or IP address of the wall box
      * @param password the password to authenticate with
@@ -201,15 +215,16 @@ public class WattpilotClient {
             if (m instanceof HelloMessage hm) {
                 logger.trace("Received HelloMessage");
                 logger.debug("Established WS connection to {}", hm.friendlyName);
-                deviceInfo =
-                        new DeviceInfo(
+                wattpilotInfo =
+                        new WattpilotInfo(
                                 hm.serial,
                                 hm.hostname,
                                 hm.friendlyName,
                                 hm.version,
                                 hm.protocol,
                                 hm.secured);
-                if (!deviceInfo.secured()) {
+                logger.debug(wattpilotInfo.toString());
+                if (!wattpilotInfo.secured()) {
                     isAuthenticated = true;
                     onConnected();
                 }
@@ -218,7 +233,7 @@ public class WattpilotClient {
             if (m instanceof AuthRequiredMessage arm) {
                 logger.trace("Received AuthRequiredMessage");
                 try {
-                    hashedPassword = hashPassword(deviceInfo.serial(), password);
+                    hashedPassword = hashPassword(wattpilotInfo.serial(), password);
                     AuthMessage authMessage =
                             createAuthMessage(hashedPassword, arm.token1, arm.token2);
                     String json = gson.toJson(authMessage);
@@ -231,7 +246,7 @@ public class WattpilotClient {
 
             if (m instanceof AuthSuccessMessage) {
                 logger.trace("Received AuthSuccessMessage");
-                logger.debug("Authenticated successfully with {}", deviceInfo.friendlyName());
+                logger.debug("Authenticated successfully with {}", wattpilotInfo.friendlyName());
                 isAuthenticated = true;
                 onConnected();
             }
@@ -241,10 +256,20 @@ public class WattpilotClient {
                 logger.error("Authentication failed: {}", rm.message);
                 onDisconnected(rm.message);
             }
+
+            if (m instanceof FullStatusMessage fsm) {
+                logger.trace("Received FullStatusMessage");
+                onStatus(fsm.status);
+            }
+
+            if (m instanceof DeltaStatusMessage dsm) {
+                logger.trace("Received DeltaStatusMessage");
+                onStatus(dsm.status);
+            }
         }
     }
 
-    private void onConnected() {
+    private void onConnected() { // NOSONAR: we want to keep this method here
         synchronized (listeners) {
             for (WattpilotClientListener listener : listeners) {
                 if (listener != null) {
@@ -254,7 +279,7 @@ public class WattpilotClient {
         }
     }
 
-    private void onDisconnected(String reason) {
+    private void onDisconnected(String reason) { // NOSONAR: we want to keep this method here
         isAuthenticated = false;
         session.close();
         synchronized (listeners) {
@@ -262,6 +287,32 @@ public class WattpilotClient {
                 if (listener != null) {
                     listener.disconnected(reason);
                 }
+            }
+        }
+    }
+
+    private void onStatus(PartialStatus status) { // NOSONAR: we want to keep this method here
+        synchronized (wattpilotStatus) {
+            if (status.isChargingAllowed() != null) {
+                wattpilotStatus.setChargingAllowed(status.isChargingAllowed());
+            }
+            if (status.getChargingCurrent() != null) {
+                wattpilotStatus.setChargingCurrent(status.getChargingCurrent());
+            }
+            if (status.getCarState() != null) {
+                wattpilotStatus.setCarState(status.getCarState());
+            }
+            if (status.getStartingPower() != null) {
+                wattpilotStatus.setStartingPower(status.getStartingPower());
+            }
+            if (status.isSinglePhaseEnforced() != null) {
+                wattpilotStatus.setForceSinglePhase(status.isSinglePhaseEnforced());
+            }
+            if (status.getChargingMode() != null) {
+                wattpilotStatus.setChargingMode(status.getChargingMode());
+            }
+            if (status.getChargingMetrics() != null) {
+                wattpilotStatus.setChargingMetrics(status.getChargingMetrics());
             }
         }
     }
