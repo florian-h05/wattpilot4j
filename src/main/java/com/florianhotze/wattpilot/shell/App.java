@@ -74,7 +74,11 @@ public class App implements WattpilotClientListener {
         String line;
         while (true) {
             line = scanner.nextLine();
-            if (line == null || line.equals("q") || line.equals("quit")) {
+            if (line == null
+                    || line.equals("q")
+                    || line.equals("quit")
+                    || line.equals("e")
+                    || line.equals("exit")) {
                 break;
             }
             if (line.equals("status")) {
