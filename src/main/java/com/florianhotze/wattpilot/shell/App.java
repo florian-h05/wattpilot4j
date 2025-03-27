@@ -23,6 +23,10 @@ import com.florianhotze.wattpilot.WattpilotClient;
 import com.florianhotze.wattpilot.WattpilotClientListener;
 import com.florianhotze.wattpilot.WattpilotInfo;
 import com.florianhotze.wattpilot.WattpilotStatus;
+import com.florianhotze.wattpilot.commands.Command;
+import com.florianhotze.wattpilot.commands.SetChargingCurrentCommand;
+import com.florianhotze.wattpilot.commands.SetChargingModeCommand;
+import com.florianhotze.wattpilot.dto.ChargingMode;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -82,6 +86,35 @@ public class App implements WattpilotClientListener {
                         "Enforce Single Phase Charging: " + status.isSinglePhaseEnforced());
                 System.out.println("Charging Current: " + status.getChargingCurrent() + " A");
                 System.out.println("Charging Metrics: " + status.getChargingMetrics());
+            }
+            if (line.startsWith("set")) {
+                String[] parts = line.split(" ");
+                if (parts.length == 3) {
+                    try {
+                        Command command =
+                                switch (parts[1]) {
+                                    case "current" ->
+                                            new SetChargingCurrentCommand(
+                                                    Integer.parseInt(parts[2]));
+                                    case "mode" ->
+                                            new SetChargingModeCommand(
+                                                    ChargingMode.valueOf(parts[2]));
+                                    default -> null;
+                                };
+                        if (command != null) {
+                            client.sendCommand(command);
+                        } else {
+                            System.err.println("Invalid command: " + line);
+                        }
+                    } catch (IOException e) {
+                        System.err.println("Failed to send command: " + e.getMessage());
+                        e.printStackTrace();
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Invalid argument: " + e.getMessage());
+                    }
+                } else {
+                    System.err.println("Invalid command: " + line);
+                }
             }
         }
         client.disconnect();

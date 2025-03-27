@@ -19,6 +19,9 @@
  */
 package com.florianhotze.wattpilot;
 
+import com.florianhotze.wattpilot.commands.Command;
+import com.florianhotze.wattpilot.commands.CommandValue;
+import com.florianhotze.wattpilot.commands.CommandValueSerializer;
 import com.florianhotze.wattpilot.dto.PartialStatus;
 import com.florianhotze.wattpilot.messages.AuthErrorMessage;
 import com.florianhotze.wattpilot.messages.AuthMessage;
@@ -30,12 +33,15 @@ import com.florianhotze.wattpilot.messages.HelloMessage;
 import com.florianhotze.wattpilot.messages.Message;
 import com.florianhotze.wattpilot.messages.MessageDeserializer;
 import com.florianhotze.wattpilot.messages.ResponseMessage;
+import com.florianhotze.wattpilot.messages.SecuredMessage;
+import com.florianhotze.wattpilot.messages.SetValueMessage;
 
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -44,8 +50,10 @@ import java.security.spec.KeySpec;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
+import javax.crypto.Mac;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -66,13 +74,17 @@ public class WattpilotClient {
     private final Gson gson =
             new GsonBuilder()
                     .registerTypeAdapter(Message.class, new MessageDeserializer())
+                    .registerTypeAdapter(CommandValue.class, new CommandValueSerializer())
                     .create();
     private final Set<WattpilotClientListener> listeners = new HashSet<>();
     private final WebSocketClient client;
+    private final WattpilotStatus wattpilotStatus = new WattpilotStatus();
+
     private Session session;
     private boolean isAuthenticated = false;
+    private byte[] hashedPassword;
     private WattpilotInfo wattpilotInfo;
-    private final WattpilotStatus wattpilotStatus = new WattpilotStatus();
+    private int requestCounter = 0;
 
     /**
      * Create a new Fronius Wattpilot client using the given {@link HttpClient}.
@@ -143,6 +155,39 @@ public class WattpilotClient {
     }
 
     /**
+     * Send a {@link Command} to the wall box.
+     *
+     * @param command the command to send
+     * @throws IOException if the command could not be sent
+     */
+    public void sendCommand(Command command) throws IOException {
+        if (!isConnected()) {
+            throw new IllegalStateException("Client is not connected");
+        }
+
+        SetValueMessage setValueMessage = SetValueMessage.fromCommand(requestCounter, command);
+        String data = gson.toJson(setValueMessage);
+        if (wattpilotInfo != null && !wattpilotInfo.secured()) {
+            logger.trace("Sending SetValueMessage {}", data);
+            session.getRemote().sendString(data);
+            return;
+        }
+
+        String hmac = null;
+        try {
+            hmac = createHmac(hashedPassword, data);
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("Could not send command: Failed to create HMAC", e);
+            throw new IOException("Failed to create HMAC", e);
+        }
+        SecuredMessage message = new SecuredMessage(data, requestCounter + "sm", hmac);
+        requestCounter++;
+        String json = gson.toJson(message);
+        logger.trace("Sending SecuredMessage {}", json);
+        session.getRemote().sendString(json);
+    }
+
+    /**
      * Establishes the WebSocket connection with the wall box.
      *
      * @param host the hostname or IP address of the wall box
@@ -170,7 +215,6 @@ public class WattpilotClient {
     /** Handles incoming WebSocket messages from the wall box. */
     private class FroniusWebsocketListener implements WebSocketListener {
         private final String password;
-        private byte[] hashedPassword;
 
         FroniusWebsocketListener(String password) {
             this.password = password;
@@ -377,6 +421,27 @@ public class WattpilotClient {
         String hash = bytesToHex(digest.digest());
 
         return new AuthMessage(token3, hash);
+    }
+
+    /**
+     * Creates a HMAC from the hashed password and the data to send.
+     *
+     * @param hashedPassword the hashed password, see {@link #hashPassword(String, String)}
+     * @param data the data to send
+     * @return the HMAC as a hex string
+     * @throws NoSuchAlgorithmException ir HMAC-SHA256 algorithm is not available
+     */
+    private static String createHmac(byte[] hashedPassword, String data)
+            throws NoSuchAlgorithmException {
+        SecretKeySpec keySpec = new SecretKeySpec(hashedPassword, "HmacSHA256");
+        Mac mac = Mac.getInstance("HmacSHA256");
+        try {
+            mac.init(keySpec);
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException(e); // NOSONAR: this should never happen
+        }
+        byte[] hmacBytes = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+        return bytesToHex(hmacBytes);
     }
 
     /**

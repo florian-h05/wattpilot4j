@@ -49,6 +49,8 @@ public enum MessageType {
     CLEAR_INVERTERS,
     @SerializedName("updateInverter")
     UPDATE_INVERTER,
+    @SerializedName("setValue")
+    SET_VALUE,
     @SerializedName("securedMsg")
     SECURED_MSG,
     @SerializedName("response")
