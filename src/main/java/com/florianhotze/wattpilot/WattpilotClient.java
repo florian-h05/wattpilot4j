@@ -33,6 +33,8 @@ import com.florianhotze.wattpilot.messages.HelloMessage;
 import com.florianhotze.wattpilot.messages.IncomingMessage;
 import com.florianhotze.wattpilot.messages.Message;
 import com.florianhotze.wattpilot.messages.MessageDeserializer;
+import com.florianhotze.wattpilot.messages.OutgoingMessage;
+import com.florianhotze.wattpilot.messages.ResponseMessage;
 import com.florianhotze.wattpilot.messages.SecuredMessage;
 import com.florianhotze.wattpilot.messages.SetValueMessage;
 
@@ -49,7 +51,10 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.crypto.Mac;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -60,6 +65,7 @@ import com.google.gson.GsonBuilder;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
+import org.eclipse.jetty.websocket.api.WriteCallback;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +85,8 @@ public class WattpilotClient {
     private final Set<WattpilotClientListener> listeners = new HashSet<>();
     private final WebSocketClient client;
     private final WattpilotStatus wattpilotStatus = new WattpilotStatus();
+    private final Map<String, CompletableFuture<ResponseMessage>> responseFutures =
+            new ConcurrentHashMap<>();
 
     private Session session;
     private boolean isAuthenticated = false;
@@ -155,36 +163,38 @@ public class WattpilotClient {
     }
 
     /**
-     * Send a {@link Command} to the wall box.
+     * Send a {@link Command} to the wall box and return a {@link CompletableFuture} that will be
+     * completed when the response is received.
      *
      * @param command the command to send
-     * @throws IOException if the command could not be sent
+     * @return a {@link CompletableFuture} that will be completed when the response is received, or
+     *     completed exceptionally with an {@link IOException} if the command could not be sent
      */
-    public void sendCommand(Command command) throws IOException {
+    public CompletableFuture<ResponseMessage> sendCommand(Command command) {
         if (!isConnected()) {
             throw new IllegalStateException("Client is not connected");
         }
 
         SetValueMessage setValueMessage = SetValueMessage.fromCommand(requestCounter, command);
-        String data = gson.toJson(setValueMessage);
         if (wattpilotInfo != null && !wattpilotInfo.secured()) {
-            logger.trace("Sending SetValueMessage {}", data);
-            session.getRemote().sendString(data);
-            return;
+            logger.trace("Sending SetValueMessage");
+            return sendOutgoingMessage(String.valueOf(setValueMessage.requestId), setValueMessage);
         }
 
+        String data = gson.toJson(setValueMessage);
         String hmac = null;
         try {
             hmac = createHmac(hashedPassword, data);
         } catch (NoSuchAlgorithmException e) {
             logger.error("Could not send command: Failed to create HMAC", e);
-            throw new IOException("Failed to create HMAC", e);
+            CompletableFuture<ResponseMessage> future = new CompletableFuture<>();
+            future.completeExceptionally(new IOException("Failed to create HMAC", e));
+            return future;
         }
-        SecuredMessage message = new SecuredMessage(data, requestCounter + "sm", hmac);
+        SecuredMessage securedMessage = new SecuredMessage(data, requestCounter + "sm", hmac);
         requestCounter++;
-        String json = gson.toJson(message);
-        logger.trace("Sending SecuredMessage {}", json);
-        session.getRemote().sendString(json);
+        logger.trace("Sending SecuredMessage");
+        return sendOutgoingMessage(String.valueOf(setValueMessage.requestId), securedMessage);
     }
 
     /**
@@ -210,6 +220,43 @@ public class WattpilotClient {
         }
 
         client.connect(new FroniusWebsocketListener(password), uri);
+    }
+
+    /**
+     * Sends an outgoing message to the wall box and returns a {@link CompletableFuture} that will
+     * be completed when the response is received.
+     *
+     * @param messageId the message ID expected of that message as expected in the response
+     * @param message the message to send
+     * @return a {@link CompletableFuture} that will be completed when the response is received, or
+     *     completed exceptionally with an {@link IOException} if the message could not be sent
+     */
+    private CompletableFuture<ResponseMessage> sendOutgoingMessage(
+            final String messageId, OutgoingMessage message) {
+        final CompletableFuture<ResponseMessage> future = new CompletableFuture<>();
+        if (!isConnected()) {
+            future.completeExceptionally(new IOException("Client is not connected"));
+            return future;
+        }
+        String json = gson.toJson(message);
+
+        logger.trace("Writing message {}", json);
+        session.getRemote()
+                .sendString(
+                        json,
+                        new WriteCallback() {
+                            @Override
+                            public void writeSuccess() {
+                                logger.trace("writeSuccess for messageId {}", messageId);
+                                responseFutures.put(messageId, future);
+                            }
+
+                            @Override
+                            public void writeFailed(Throwable t) {
+                                future.completeExceptionally(t);
+                            }
+                        });
+        return future;
     }
 
     /** Handles incoming WebSocket messages from the wall box. */
@@ -309,6 +356,15 @@ public class WattpilotClient {
             if (m instanceof DeltaStatusMessage dsm) {
                 logger.trace("Received DeltaStatusMessage");
                 onStatus(dsm.status);
+            }
+
+            if (m instanceof ResponseMessage rm) {
+                logger.trace("Received ResponseMessage");
+                CompletableFuture<ResponseMessage> future =
+                        responseFutures.remove(rm.getRequestId());
+                if (future != null) {
+                    future.complete(rm);
+                }
             }
         }
     }

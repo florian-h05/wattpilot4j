@@ -27,9 +27,13 @@ import com.florianhotze.wattpilot.commands.Command;
 import com.florianhotze.wattpilot.commands.SetChargingCurrentCommand;
 import com.florianhotze.wattpilot.commands.SetChargingModeCommand;
 import com.florianhotze.wattpilot.dto.ChargingMode;
+import com.florianhotze.wattpilot.messages.ResponseMessage;
 
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.eclipse.jetty.client.HttpClient;
 
@@ -102,11 +106,17 @@ public class App implements WattpilotClientListener {
                                     default -> null;
                                 };
                         if (command != null) {
-                            client.sendCommand(command);
+                            ResponseMessage rm =
+                                    client.sendCommand(command).get(5, TimeUnit.SECONDS);
+                            if (rm != null && rm.isSuccess()) {
+                                System.out.println("Command successful");
+                            } else {
+                                System.err.println("Command failed");
+                            }
                         } else {
                             System.err.println("Invalid command: " + line);
                         }
-                    } catch (IOException e) {
+                    } catch (InterruptedException | ExecutionException | TimeoutException e) {
                         System.err.println("Failed to send command: " + e.getMessage());
                         e.printStackTrace();
                     } catch (IllegalArgumentException e) {
