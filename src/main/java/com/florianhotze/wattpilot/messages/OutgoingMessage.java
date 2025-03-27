@@ -20,7 +20,7 @@
 package com.florianhotze.wattpilot.messages;
 
 /**
- * Base class for all outgoing WebSocket messages, i.e. messages sent to the wall box.
+ * Base class for all outgoing WebSocket messages, i.e. messages sent to the wallbox.
  *
  * @author Florian Hotze - Initial contribution
  */

@@ -23,7 +23,7 @@ import com.florianhotze.wattpilot.dto.ChargingMode;
 import com.florianhotze.wattpilot.dto.PropertyKeys;
 
 /**
- * Command to set the charging mode of the wall box.
+ * Command to set the charging mode of the wallbox.
  *
  * @author Florian Hotze - Initial contribution
  */

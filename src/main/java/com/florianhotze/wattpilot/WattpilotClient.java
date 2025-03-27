@@ -71,7 +71,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Client for the Fronius Wattpilot wall box.
+ * Client for the Fronius Wattpilot wallbox.
  *
  * @author Florian Hotze - Initial contribution
  */
@@ -146,7 +146,7 @@ public class WattpilotClient {
     }
 
     /**
-     * Get the {@link WattpilotInfo} of the wall box.
+     * Get the {@link WattpilotInfo} of the wallbox.
      *
      * @return the device info or <code>null</code> if not available yet
      */
@@ -155,7 +155,7 @@ public class WattpilotClient {
     }
 
     /**
-     * Get the current status of the wall box.
+     * Get the current status of the wallbox.
      *
      * @return the current status or <code>null</code> if not available yet
      */
@@ -167,7 +167,7 @@ public class WattpilotClient {
     }
 
     /**
-     * Send a {@link Command} to the wall box and return a {@link CompletableFuture} that will be
+     * Send a {@link Command} to the wallbox and return a {@link CompletableFuture} that will be
      * completed when the response is received.
      *
      * @param command the command to send
@@ -202,9 +202,9 @@ public class WattpilotClient {
     }
 
     /**
-     * Establishes the WebSocket connection with the wall box.
+     * Establishes the WebSocket connection with the wallbox.
      *
-     * @param host the hostname or IP address of the wall box
+     * @param host the hostname or IP address of the wallbox
      * @param password the password to authenticate with
      * @throws IOException if the connection fails
      */
@@ -213,7 +213,7 @@ public class WattpilotClient {
         try {
             uri = new URI(String.format("ws://%s/ws", host));
         } catch (URISyntaxException e) {
-            throw new IOException("Invalid wall box host", e);
+            throw new IOException("Invalid wallbox host", e);
         }
 
         try {
@@ -227,8 +227,8 @@ public class WattpilotClient {
     }
 
     /**
-     * Sends an outgoing message to the wall box and returns a {@link CompletableFuture} that will
-     * be completed when the response is received.
+     * Sends an outgoing message to the wallbox and returns a {@link CompletableFuture} that will be
+     * completed when the response is received.
      *
      * @param messageId the message ID expected of that message as expected in the response
      * @param message the message to send
@@ -263,7 +263,7 @@ public class WattpilotClient {
         return future;
     }
 
-    /** Handles incoming WebSocket messages from the wall box. */
+    /** Handles incoming WebSocket messages from the wallbox. */
     private class FroniusWebsocketListener implements WebSocketListener {
         private final String password;
 

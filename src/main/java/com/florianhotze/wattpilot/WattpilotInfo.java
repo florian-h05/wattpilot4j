@@ -22,10 +22,10 @@ package com.florianhotze.wattpilot;
 /**
  * Record for Wattpilot information received on connection establishment.
  *
- * @param serial serial number of the wall box
- * @param hostname hostname of the wall box
- * @param friendlyName friendly name of the wall box, i.e. what is displayed in the app
- * @param firmwareVersion firmware version of the wall box
+ * @param serial serial number of the wallbox
+ * @param hostname hostname of the wallbox
+ * @param friendlyName friendly name of the wallbox, i.e. what is displayed in the app
+ * @param firmwareVersion firmware version of the wallbox
  * @param protocolVersion protocol version
  * @param secured whether the connection has to be authenticated
  * @author Florian Hotze - Initial contribution

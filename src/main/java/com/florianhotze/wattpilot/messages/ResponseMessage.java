@@ -55,7 +55,7 @@ public class ResponseMessage extends IncomingMessage {
     }
 
     /**
-     * Get the partial status of the wall box after the operation.
+     * Get the partial status of the wallbox after the operation.
      *
      * @return
      */

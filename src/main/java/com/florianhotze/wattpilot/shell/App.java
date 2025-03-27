@@ -100,17 +100,17 @@ public class App implements WattpilotClientListener {
 
     @Override
     public void connected() {
-        System.out.println("Wall box connected");
+        System.out.println("Wallbox connected");
     }
 
     @Override
     public void disconnected(String reason) {
-        System.out.println("Wall box disconnected: " + reason);
+        System.out.println("Wallbox disconnected: " + reason);
     }
 
     private static void printHelp() {
         System.out.println("Commands:");
-        System.out.println("  status - get the current status of the wall box");
+        System.out.println("  status - get the current status of the wallbox");
         System.out.println("  set current <current> - set the charging current in A [6-32]");
         System.out.println("  set mode <mode> - set the charging mode (DEFAULT, ECO, NEXT_TRIP)");
         System.out.println(
@@ -119,7 +119,7 @@ public class App implements WattpilotClientListener {
     }
 
     private static void printStatus(WattpilotInfo info, WattpilotStatus status) {
-        System.out.println("Wall Box: " + info.friendlyName());
+        System.out.println("Wallbox: " + info.friendlyName());
         System.out.println("Serial Number: " + info.serial());
         System.out.println("Firmware Version: " + info.firmwareVersion());
         System.out.println("Car Status: " + status.getCarState());

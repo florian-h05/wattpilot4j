@@ -20,7 +20,7 @@
 package com.florianhotze.wattpilot.commands;
 
 /**
- * Base class for all commands that can be sent to the wall box.
+ * Base class for all commands that can be sent to the wallbox.
  *
  * @author Florian Hotze - Initial contribution
  */

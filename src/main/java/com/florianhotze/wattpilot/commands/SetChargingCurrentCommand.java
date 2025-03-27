@@ -22,7 +22,7 @@ package com.florianhotze.wattpilot.commands;
 import com.florianhotze.wattpilot.dto.PropertyKeys;
 
 /**
- * Command to set the charging current of the wall box.
+ * Command to set the charging current of the wallbox.
  *
  * @author Florian Hotze - Initial contribution
  */
