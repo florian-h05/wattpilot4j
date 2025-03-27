@@ -90,6 +90,7 @@ public class WattpilotClient {
 
     private Session session;
     private boolean isAuthenticated = false;
+    private boolean isInitialized = false;
     private byte[] hashedPassword;
     private WattpilotInfo wattpilotInfo;
     private int requestCounter = 0;
@@ -156,9 +157,12 @@ public class WattpilotClient {
     /**
      * Get the current status of the wall box.
      *
-     * @return the current status
+     * @return the current status or <code>null</code> if not available yet
      */
     public WattpilotStatus getStatus() {
+        if (!isInitialized) {
+            return null;
+        }
         return wattpilotStatus;
     }
 
@@ -240,7 +244,7 @@ public class WattpilotClient {
         }
         String json = gson.toJson(message);
 
-        logger.trace("Writing message {}", json);
+        logger.debug("Writing message {}", json);
         session.getRemote()
                 .sendString(
                         json,
@@ -355,6 +359,10 @@ public class WattpilotClient {
 
             if (m instanceof DeltaStatusMessage dsm) {
                 logger.trace("Received DeltaStatusMessage");
+                if (!isInitialized) {
+                    isInitialized = true;
+                    logger.debug("Received (all parts of) full status, status is initialized now");
+                }
                 onStatus(dsm.status);
             }
 
@@ -382,6 +390,7 @@ public class WattpilotClient {
     private void onDisconnected(String reason) { // NOSONAR: we want to keep this method here
         isAuthenticated = false;
         session.close();
+        // notify listeners
         synchronized (listeners) {
             for (WattpilotClientListener listener : listeners) {
                 if (listener != null) {
@@ -389,30 +398,53 @@ public class WattpilotClient {
                 }
             }
         }
+        // complete all pending futures exceptionally
+        responseFutures.forEach(
+                (key, future) -> {
+                    future.completeExceptionally(new IOException("Client disconnected"));
+                    responseFutures.remove(key);
+                });
     }
 
     private void onStatus(PartialStatus status) { // NOSONAR: we want to keep this method here
+        boolean hasChanged = false;
         synchronized (wattpilotStatus) {
             if (status.isChargingAllowed() != null) {
                 wattpilotStatus.setChargingAllowed(status.isChargingAllowed());
+                hasChanged = true;
             }
             if (status.getChargingCurrent() != null) {
                 wattpilotStatus.setChargingCurrent(status.getChargingCurrent());
+                hasChanged = true;
             }
             if (status.getCarState() != null) {
                 wattpilotStatus.setCarState(status.getCarState());
+                hasChanged = true;
             }
             if (status.getStartingPower() != null) {
                 wattpilotStatus.setStartingPower(status.getStartingPower());
+                hasChanged = true;
             }
             if (status.isSinglePhaseEnforced() != null) {
                 wattpilotStatus.setForceSinglePhase(status.isSinglePhaseEnforced());
+                hasChanged = true;
             }
             if (status.getChargingMode() != null) {
                 wattpilotStatus.setChargingMode(status.getChargingMode());
+                hasChanged = true;
             }
             if (status.getChargingMetrics() != null) {
                 wattpilotStatus.setChargingMetrics(status.getChargingMetrics());
+                hasChanged = true;
+            }
+        }
+        if (isInitialized && hasChanged) {
+            synchronized (listeners) {
+                for (WattpilotClientListener listener : listeners) {
+                    if (listener != null) {
+                        listener.onStatusChange(wattpilotStatus);
+                    }
+                }
             }
         }
     }

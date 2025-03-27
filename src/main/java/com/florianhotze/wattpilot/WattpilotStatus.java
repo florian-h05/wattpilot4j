@@ -29,36 +29,36 @@ import com.florianhotze.wattpilot.dto.ChargingMode;
  * @author Florian Hotze - Initial contribution
  */
 public class WattpilotStatus {
-    private Boolean chargingAllowed;
-    private Integer chargingCurrent;
+    private boolean chargingAllowed;
+    private int chargingCurrent;
     private CarState carState;
-    private Boolean forceSinglePhase;
-    private Float startingPower;
+    private boolean forceSinglePhase;
+    private float startingPower;
     private ChargingMode chargingMode;
     private ChargingMetrics chargingMetrics;
 
     /**
      * Whether charging is currently allowed.
      *
-     * @return whether charging is allowed or <code>null</code> if unknown
+     * @return whether charging is allowed
      */
-    public Boolean isChargingAllowed() {
+    public boolean isChargingAllowed() {
         return chargingAllowed;
     }
 
     /**
      * Get the configured charging current.
      *
-     * @return the configured charging current in amperes or <code>null</code> if unknown
+     * @return the configured charging current in amperes
      */
-    public Integer getChargingCurrent() {
+    public int getChargingCurrent() {
         return chargingCurrent;
     }
 
     /**
      * Get the current state of the (connected) car.
      *
-     * @return the current state of the car or <code>null</code> if unknown
+     * @return the current state of the car
      */
     public CarState getCarState() {
         return carState;
@@ -69,23 +69,23 @@ public class WattpilotStatus {
      *
      * @return the configured starting power in kW or <code>null</code> if unknown
      */
-    public Float getStartingPower() {
+    public float getStartingPower() {
         return startingPower;
     }
 
     /**
      * Whether single phase charging is currently enforced.
      *
-     * @return
+     * @return whether single phase charging is enforced
      */
-    public Boolean isSinglePhaseEnforced() {
+    public boolean isSinglePhaseEnforced() {
         return forceSinglePhase;
     }
 
     /**
      * Get the configured charging mode.
      *
-     * @return the configured charge mode or <code>null</code> if unknown
+     * @return the configured charge mode
      */
     public ChargingMode getChargingMode() {
         return chargingMode;
@@ -94,7 +94,7 @@ public class WattpilotStatus {
     /**
      * Get the current charging metrics.
      *
-     * @return the current charging metrics or <code>null</code> if unknown
+     * @return the current charging metrics
      */
     public ChargingMetrics getChargingMetrics() {
         return chargingMetrics;

@@ -25,7 +25,20 @@ package com.florianhotze.wattpilot;
  * @author Florian Hotze - Initial contribution
  */
 public interface WattpilotClientListener {
+    /** Called when the client successfully connected to the wall box. */
     void connected();
 
+    /**
+     * Called when the client disconnected from the wall box.
+     *
+     * @param reason the reason for the disconnection
+     */
     void disconnected(String reason);
+
+    /**
+     * Called when the client receives a status change from the wall box.
+     *
+     * @param status the new status
+     */
+    default void onStatusChange(WattpilotStatus status) {};
 }
