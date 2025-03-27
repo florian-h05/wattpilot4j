@@ -30,9 +30,9 @@ import com.florianhotze.wattpilot.messages.AuthSuccessMessage;
 import com.florianhotze.wattpilot.messages.DeltaStatusMessage;
 import com.florianhotze.wattpilot.messages.FullStatusMessage;
 import com.florianhotze.wattpilot.messages.HelloMessage;
+import com.florianhotze.wattpilot.messages.IncomingMessage;
 import com.florianhotze.wattpilot.messages.Message;
 import com.florianhotze.wattpilot.messages.MessageDeserializer;
-import com.florianhotze.wattpilot.messages.ResponseMessage;
 import com.florianhotze.wattpilot.messages.SecuredMessage;
 import com.florianhotze.wattpilot.messages.SetValueMessage;
 
@@ -252,7 +252,7 @@ public class WattpilotClient {
                 return;
             }
 
-            if (!(m instanceof ResponseMessage)) {
+            if (!(m instanceof IncomingMessage)) {
                 logger.warn("onWebSocketText received unexpected message: {}", message);
             }
 

@@ -25,7 +25,7 @@ package com.florianhotze.wattpilot.messages;
  *
  * @author Florian Hotze - Initial contribution
  */
-public class SecuredMessage extends RequestMessage {
+public class SecuredMessage extends OutgoingMessage {
     public final String data;
     public final String requestId;
     public final String hmac;

@@ -26,7 +26,7 @@ import com.florianhotze.wattpilot.dto.PartialStatus;
  *
  * @author Florian Hotze - Initial contribution
  */
-public class DeltaStatusMessage extends ResponseMessage {
+public class DeltaStatusMessage extends IncomingMessage {
     public PartialStatus status;
 
     DeltaStatusMessage() {

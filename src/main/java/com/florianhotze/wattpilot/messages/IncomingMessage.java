@@ -20,12 +20,12 @@
 package com.florianhotze.wattpilot.messages;
 
 /**
- * Base class for all WebSocket request messages, i.e. messages send to the wall box.
+ * Base class for all incoming WebSocket messages, i.e. messages received from the wall box.
  *
  * @author Florian Hotze - Initial contribution
  */
-public abstract class RequestMessage extends Message {
-    RequestMessage(MessageType type) {
+public abstract class IncomingMessage extends Message {
+    IncomingMessage(MessageType type) {
         super(type);
     }
 }

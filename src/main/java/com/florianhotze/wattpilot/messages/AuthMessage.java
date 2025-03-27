@@ -24,7 +24,7 @@ package com.florianhotze.wattpilot.messages;
  *
  * @author Florian Hotze - Initial contribution
  */
-public class AuthMessage extends RequestMessage {
+public class AuthMessage extends OutgoingMessage {
     public final String token3;
     public final String hash;
 

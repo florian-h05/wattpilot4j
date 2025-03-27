@@ -26,7 +26,7 @@ import com.google.gson.annotations.SerializedName;
  *
  * @author Florian Hotze - Initial contribution
  */
-public class HelloMessage extends ResponseMessage {
+public class HelloMessage extends IncomingMessage {
     public String serial;
     public String hostname;
 

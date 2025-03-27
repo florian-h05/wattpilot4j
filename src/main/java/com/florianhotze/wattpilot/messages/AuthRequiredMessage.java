@@ -24,7 +24,7 @@ package com.florianhotze.wattpilot.messages;
  *
  * @author Florian Hotze - Initial contribution
  */
-public class AuthRequiredMessage extends ResponseMessage {
+public class AuthRequiredMessage extends IncomingMessage {
     public String token1;
     public String token2;
 

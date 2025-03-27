@@ -24,7 +24,7 @@ package com.florianhotze.wattpilot.messages;
  *
  * @author Florian Hotze - Initial contribution
  */
-public class AuthSuccessMessage extends ResponseMessage {
+public class AuthSuccessMessage extends IncomingMessage {
     public String token3;
     public String hash;
 

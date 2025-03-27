@@ -27,7 +27,7 @@ import com.florianhotze.wattpilot.commands.CommandValue;
  *
  * @author Florian Hotze - Initial contribution
  */
-public class SetValueMessage extends RequestMessage {
+public class SetValueMessage extends OutgoingMessage {
     public final int requestId;
     public final String key;
     public final CommandValue<?> value;
