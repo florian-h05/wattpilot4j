@@ -65,11 +65,11 @@ public class WattpilotStatus {
     }
 
     /**
-     * Get the configured starting power, i.e. the power at which charging starts.
+     * Get the configured charging power threshold, i.e. the power at which charging starts.
      *
-     * @return the configured starting power in kW or <code>null</code> if unknown
+     * @return the configured charging power threshold in kW
      */
-    public float getStartingPower() {
+    public float getChargingPowerThreshold() {
         return startingPower;
     }
 

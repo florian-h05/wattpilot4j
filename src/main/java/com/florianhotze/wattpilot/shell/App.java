@@ -93,6 +93,10 @@ public class App implements WattpilotClientListener {
                 System.out.println(
                         "Enforce Single Phase Charging: " + status.isSinglePhaseEnforced());
                 System.out.println("Charging Current: " + status.getChargingCurrent() + " A");
+                System.out.println(
+                        String.format(
+                                "Charging Power Threshold: %.1f kW",
+                                status.getChargingPowerThreshold()));
                 System.out.println("Charging Metrics: " + status.getChargingMetrics());
             }
             if (line.startsWith("set")) {

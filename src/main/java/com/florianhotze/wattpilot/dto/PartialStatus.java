@@ -97,12 +97,15 @@ public class PartialStatus {
     }
 
     /**
-     * Starting power in watts. This is the minimum power at which charging can be started.
+     * Starting power in kilowatts. This is the minimum power at which charging can be started.
      *
      * @return
      */
     public Float getStartingPower() {
-        return startingPower;
+        if (startingPower == null) {
+            return null;
+        }
+        return startingPower * 0.001f;
     }
 
     /**
