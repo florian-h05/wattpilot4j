@@ -75,63 +75,19 @@ public class App implements WattpilotClientListener {
         String line;
         while (true) {
             line = scanner.nextLine();
-            if (line == null
-                    || line.equals("q")
+            if (line == null || line.equals("help")) {
+                printHelp();
+            } else if (line.equals("q")
                     || line.equals("quit")
                     || line.equals("e")
                     || line.equals("exit")) {
                 break;
-            }
-            if (line.equals("status")) {
-                WattpilotInfo wattpilotInfo = client.getDeviceInfo();
-                WattpilotStatus status = client.getStatus();
-                System.out.println("Wall Box: " + wattpilotInfo.friendlyName());
-                System.out.println("Serial Number: " + wattpilotInfo.serial());
-                System.out.println("Firmware Version: " + wattpilotInfo.firmwareVersion());
-                System.out.println("Car Status: " + status.getCarState());
-                System.out.println("Charging Allowed: " + status.isChargingAllowed());
-                System.out.println("Charging Mode: " + status.getChargingMode());
-                System.out.println(
-                        "Enforce Single Phase Charging: " + status.isSinglePhaseEnforced());
-                System.out.println("Charging Current: " + status.getChargingCurrent() + " A");
-                System.out.println(
-                        String.format(
-                                "Charging Power Threshold: %.1f kW",
-                                status.getChargingPowerThreshold()));
-                System.out.println("Charging Metrics: " + status.getChargingMetrics());
-            }
-            if (line.startsWith("set")) {
+            } else if (line.equals("status")) {
+                printStatus(client.getDeviceInfo(), client.getStatus());
+            } else if (line.startsWith("set")) {
                 String[] parts = line.split(" ");
                 if (parts.length == 3) {
-                    try {
-                        Command command =
-                                switch (parts[1]) {
-                                    case "current" ->
-                                            new SetChargingCurrentCommand(
-                                                    Integer.parseInt(parts[2]));
-                                    case "mode" ->
-                                            new SetChargingModeCommand(
-                                                    ChargingMode.valueOf(parts[2]));
-                                    case "threshold" -> new SetChargingPowerThresholdCommand(Float.valueOf(parts[2]));
-                                    default -> null;
-                                };
-                        if (command != null) {
-                            ResponseMessage rm =
-                                    client.sendCommand(command).get(5, TimeUnit.SECONDS);
-                            if (rm != null && rm.isSuccess()) {
-                                System.out.println("Command successful");
-                            } else {
-                                System.err.println("Command failed");
-                            }
-                        } else {
-                            System.err.println("Invalid command: " + line);
-                        }
-                    } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                        System.err.println("Failed to send command: " + e.getMessage());
-                        e.printStackTrace();
-                    } catch (IllegalArgumentException e) {
-                        System.err.println("Invalid argument: " + e.getMessage());
-                    }
+                    handleCommand(line, client);
                 } else {
                     System.err.println("Invalid command: " + line);
                 }
@@ -144,11 +100,65 @@ public class App implements WattpilotClientListener {
 
     @Override
     public void connected() {
-        System.out.println("Wallbox connected");
+        System.out.println("Wall box connected");
     }
 
     @Override
     public void disconnected(String reason) {
-        System.out.println("Wallbox disconnected: " + reason);
+        System.out.println("Wall box disconnected: " + reason);
+    }
+
+    private static void printHelp() {
+        System.out.println("Commands:");
+        System.out.println("  status - get the current status of the wall box");
+        System.out.println("  set current <current> - set the charging current in A [6-32]");
+        System.out.println("  set mode <mode> - set the charging mode (DEFAULT, ECO, NEXT_TRIP)");
+        System.out.println(
+                "  set threshold <threshold> - set the charging power threshold in kW [1.4-22.0]");
+        System.out.println("  q, quit, e, exit - quit the shell");
+    }
+
+    private static void printStatus(WattpilotInfo info, WattpilotStatus status) {
+        System.out.println("Wall Box: " + info.friendlyName());
+        System.out.println("Serial Number: " + info.serial());
+        System.out.println("Firmware Version: " + info.firmwareVersion());
+        System.out.println("Car Status: " + status.getCarState());
+        System.out.println("Charging Allowed: " + status.isChargingAllowed());
+        System.out.println("Charging Mode: " + status.getChargingMode());
+        System.out.println("Enforce Single Phase Charging: " + status.isSinglePhaseEnforced());
+        System.out.println("Charging Current: " + status.getChargingCurrent() + " A");
+        System.out.println(
+                String.format(
+                        "Charging Power Threshold: %.1f kW", status.getChargingPowerThreshold()));
+        System.out.println("Charging Metrics: " + status.getChargingMetrics());
+    }
+
+    private static void handleCommand(String line, WattpilotClient client) {
+        String[] parts = line.split(" ");
+        try {
+            Command command =
+                    switch (parts[1]) {
+                        case "current" -> new SetChargingCurrentCommand(Integer.parseInt(parts[2]));
+                        case "mode" -> new SetChargingModeCommand(ChargingMode.valueOf(parts[2]));
+                        case "threshold" ->
+                                new SetChargingPowerThresholdCommand(Float.valueOf(parts[2]));
+                        default -> null;
+                    };
+            if (command != null) {
+                ResponseMessage rm = client.sendCommand(command).get(5, TimeUnit.SECONDS);
+                if (rm != null && rm.isSuccess()) {
+                    System.out.println("Command successful");
+                } else {
+                    System.err.println("Command failed");
+                }
+            } else {
+                System.err.println("Invalid command: " + line);
+            }
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            System.err.println("Failed to send command: " + e.getMessage());
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            System.err.println("Invalid argument: " + e.getMessage());
+        }
     }
 }
