@@ -26,6 +26,7 @@ import com.florianhotze.wattpilot.WattpilotStatus;
 import com.florianhotze.wattpilot.commands.Command;
 import com.florianhotze.wattpilot.commands.SetChargingCurrentCommand;
 import com.florianhotze.wattpilot.commands.SetChargingModeCommand;
+import com.florianhotze.wattpilot.commands.SetChargingPowerThresholdCommand;
 import com.florianhotze.wattpilot.dto.ChargingMode;
 import com.florianhotze.wattpilot.messages.ResponseMessage;
 
@@ -111,6 +112,7 @@ public class App implements WattpilotClientListener {
                                     case "mode" ->
                                             new SetChargingModeCommand(
                                                     ChargingMode.valueOf(parts[2]));
+                                    case "threshold" -> new SetChargingPowerThresholdCommand(Float.valueOf(parts[2]));
                                     default -> null;
                                 };
                         if (command != null) {
