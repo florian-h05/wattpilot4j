@@ -40,5 +40,5 @@ public interface WattpilotClientListener {
      *
      * @param status the new status
      */
-    default void onStatusChange(WattpilotStatus status) {}
+    default void statusChanged(WattpilotStatus status) {}
 }

@@ -362,6 +362,7 @@ public class WattpilotClient {
                 if (!isInitialized) {
                     isInitialized = true;
                     logger.debug("Received (all parts of) full status, status is initialized now");
+                    notifyListenersAboutStatusChange();
                 }
                 onStatus(dsm.status);
             }
@@ -407,7 +408,9 @@ public class WattpilotClient {
     }
 
     private void onStatus(PartialStatus status) { // NOSONAR: we want to keep this method here
-        boolean hasChanged = false;
+        boolean hasChanged =
+                false; // as a field is only not-null if it is present in a (fragment of a) full
+        // message or a delta message, we can assume that it has changed then
         synchronized (wattpilotStatus) {
             if (status.isChargingAllowed() != null) {
                 wattpilotStatus.setChargingAllowed(status.isChargingAllowed());
@@ -438,12 +441,18 @@ public class WattpilotClient {
                 hasChanged = true;
             }
         }
-        if (isInitialized && hasChanged) {
-            synchronized (listeners) {
-                for (WattpilotClientListener listener : listeners) {
-                    if (listener != null) {
-                        listener.onStatusChange(wattpilotStatus);
-                    }
+        if (isInitialized
+                && hasChanged) { // only notify if status has been updated by a delta message, i.e.
+            // after state initialization
+            notifyListenersAboutStatusChange();
+        }
+    }
+
+    private void notifyListenersAboutStatusChange() {
+        synchronized (listeners) {
+            for (WattpilotClientListener listener : listeners) {
+                if (listener != null) {
+                    listener.statusChanged(wattpilotStatus);
                 }
             }
         }
