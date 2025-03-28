@@ -68,6 +68,20 @@
 
   <build>
     <plugins>
+      <!-- Source Plugin to attach sources as JAR -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Assembly Plugin to build an assembly JAR of the shell app -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
