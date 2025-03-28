@@ -125,7 +125,7 @@ public class App implements WattpilotClientListener {
         System.out.println("Car Status: " + status.getCarState());
         System.out.println("Charging Allowed: " + status.isChargingAllowed());
         System.out.println("Charging Mode: " + status.getChargingMode());
-        System.out.println("Enforce Single Phase Charging: " + status.isSinglePhaseEnforced());
+        System.out.println("Single Phase Charging: " + status.isChargingSinglePhase());
         System.out.println("Charging Current: " + status.getChargingCurrent() + " A");
         System.out.println(
                 String.format(

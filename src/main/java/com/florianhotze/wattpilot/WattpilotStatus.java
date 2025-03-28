@@ -32,7 +32,7 @@ public class WattpilotStatus {
     private boolean chargingAllowed;
     private int chargingCurrent;
     private CarState carState;
-    private boolean forceSinglePhase;
+    private boolean chargingSinglePhase;
     private float startingPower;
     private ChargingMode chargingMode;
     private ChargingMetrics chargingMetrics;
@@ -74,12 +74,12 @@ public class WattpilotStatus {
     }
 
     /**
-     * Whether single phase charging is currently enforced.
+     * Whether single phase charging is currently used.
      *
-     * @return whether single phase charging is enforced
+     * @return whether single phase charging is used
      */
-    public boolean isSinglePhaseEnforced() {
-        return forceSinglePhase;
+    public boolean isChargingSinglePhase() {
+        return chargingSinglePhase;
     }
 
     /**
@@ -112,8 +112,8 @@ public class WattpilotStatus {
         this.carState = carState;
     }
 
-    void setForceSinglePhase(boolean forceSinglePhase) {
-        this.forceSinglePhase = forceSinglePhase;
+    void setChargingSinglePhase(boolean chargingSinglePhase) {
+        this.chargingSinglePhase = chargingSinglePhase;
     }
 
     void setStartingPower(float startingPower) {

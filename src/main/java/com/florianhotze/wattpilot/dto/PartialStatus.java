@@ -46,7 +46,7 @@ public class PartialStatus {
     Integer errorState;
 
     @SerializedName(PropertyKeys.FORCE_SINGLE_PHASE)
-    Boolean forceSinglePhase;
+    Boolean chargingSinglePhase;
 
     @SerializedName(PropertyKeys.STARTING_POWER)
     Float startingPower;
@@ -88,12 +88,12 @@ public class PartialStatus {
     }
 
     /**
-     * Whether single phase charging is currently enforced.
+     * Whether single phase charging is currently used.
      *
      * @return
      */
-    public Boolean isSinglePhaseEnforced() {
-        return forceSinglePhase;
+    public Boolean isChargingSinglePhase() {
+        return chargingSinglePhase;
     }
 
     /**
