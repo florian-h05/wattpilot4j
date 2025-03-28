@@ -1,0 +1,13 @@
+Bundle-Name: ${project.name}
+Bundle-Description: ${project.description}
+Bundle-License: Apache 2.0
+Bundle-Version: ${project.version}
+Import-Package:\
+    *
+Export-Package:\
+  !NOTICE, \
+  com.florianhotze.wattpilot;version=${project.version}, \
+  com.florianhotze.wattpilot.commands;version=${project.version}, \
+    com.florianhotze.wattpilot.dto;version=${project.version}
+-includeresource: \
+  NOTICE
