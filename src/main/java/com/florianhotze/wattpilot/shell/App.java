@@ -24,11 +24,11 @@ import com.florianhotze.wattpilot.WattpilotClientListener;
 import com.florianhotze.wattpilot.WattpilotInfo;
 import com.florianhotze.wattpilot.WattpilotStatus;
 import com.florianhotze.wattpilot.commands.Command;
+import com.florianhotze.wattpilot.commands.CommandResponse;
 import com.florianhotze.wattpilot.commands.SetChargingCurrentCommand;
 import com.florianhotze.wattpilot.commands.SetChargingModeCommand;
 import com.florianhotze.wattpilot.commands.SetChargingPowerThresholdCommand;
 import com.florianhotze.wattpilot.dto.ChargingMode;
-import com.florianhotze.wattpilot.messages.ResponseMessage;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -145,8 +145,8 @@ public class App implements WattpilotClientListener {
                         default -> null;
                     };
             if (command != null) {
-                ResponseMessage rm = client.sendCommand(command).get(5, TimeUnit.SECONDS);
-                if (rm != null && rm.isSuccess()) {
+                CommandResponse res = client.sendCommand(command).get(5, TimeUnit.SECONDS);
+                if (res != null && res.success()) {
                     System.out.println("Command successful");
                 } else {
                     System.err.println("Command failed");

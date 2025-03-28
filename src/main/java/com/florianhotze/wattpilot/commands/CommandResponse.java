@@ -17,22 +17,16 @@
  * limitations under the License.
  * #L%
  */
-package com.florianhotze.wattpilot.messages;
+package com.florianhotze.wattpilot.commands;
 
 import com.florianhotze.wattpilot.dto.PartialStatus;
 
 /**
- * Response Message. Received after sending a {@link SetValueMessage} (or {@link SecuredMessage} and
- * contains the result of the operation.
+ * Record for the response of a {@link Command}.
  *
+ * @param success whether the command was successful
+ * @param status The partial status received. Contains only the new values of the changed
+ *     parameters.
  * @author Florian Hotze - Initial contribution
  */
-public class ResponseMessage extends IncomingMessage {
-    public String requestId;
-    public boolean success;
-    public PartialStatus status;
-
-    ResponseMessage() {
-        super(MessageType.RESPONSE);
-    }
-}
+public record CommandResponse(boolean success, PartialStatus status) {}

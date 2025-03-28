@@ -20,6 +20,7 @@
 package com.florianhotze.wattpilot;
 
 import com.florianhotze.wattpilot.commands.Command;
+import com.florianhotze.wattpilot.commands.CommandResponse;
 import com.florianhotze.wattpilot.commands.CommandValue;
 import com.florianhotze.wattpilot.commands.CommandValueSerializer;
 import com.florianhotze.wattpilot.dto.PartialStatus;
@@ -85,7 +86,7 @@ public class WattpilotClient {
     private final Set<WattpilotClientListener> listeners = new HashSet<>();
     private final WebSocketClient client;
     private final WattpilotStatus wattpilotStatus = new WattpilotStatus();
-    private final Map<String, CompletableFuture<ResponseMessage>> responseFutures =
+    private final Map<String, CompletableFuture<CommandResponse>> responseFutures =
             new ConcurrentHashMap<>();
 
     private Session session;
@@ -174,7 +175,7 @@ public class WattpilotClient {
      * @return a {@link CompletableFuture} that will be completed when the response is received, or
      *     completed exceptionally with an {@link IOException} if the command could not be sent
      */
-    public CompletableFuture<ResponseMessage> sendCommand(Command command) {
+    public CompletableFuture<CommandResponse> sendCommand(Command command) {
         if (!isConnected()) {
             throw new IllegalStateException("Client is not connected");
         }
@@ -191,7 +192,7 @@ public class WattpilotClient {
             hmac = createHmac(hashedPassword, data);
         } catch (NoSuchAlgorithmException e) {
             logger.error("Could not send command: Failed to create HMAC", e);
-            CompletableFuture<ResponseMessage> future = new CompletableFuture<>();
+            CompletableFuture<CommandResponse> future = new CompletableFuture<>();
             future.completeExceptionally(new IOException("Failed to create HMAC", e));
             return future;
         }
@@ -235,9 +236,9 @@ public class WattpilotClient {
      * @return a {@link CompletableFuture} that will be completed when the response is received, or
      *     completed exceptionally with an {@link IOException} if the message could not be sent
      */
-    private CompletableFuture<ResponseMessage> sendOutgoingMessage(
+    private CompletableFuture<CommandResponse> sendOutgoingMessage(
             final String messageId, OutgoingMessage message) {
-        final CompletableFuture<ResponseMessage> future = new CompletableFuture<>();
+        final CompletableFuture<CommandResponse> future = new CompletableFuture<>();
         if (!isConnected()) {
             future.completeExceptionally(new IOException("Client is not connected"));
             return future;
@@ -369,10 +370,9 @@ public class WattpilotClient {
 
             if (m instanceof ResponseMessage rm) {
                 logger.trace("Received ResponseMessage");
-                CompletableFuture<ResponseMessage> future =
-                        responseFutures.remove(rm.getRequestId());
+                CompletableFuture<CommandResponse> future = responseFutures.remove(rm.requestId);
                 if (future != null) {
-                    future.complete(rm);
+                    future.complete(new CommandResponse(rm.success, rm.status));
                 }
             }
         }
