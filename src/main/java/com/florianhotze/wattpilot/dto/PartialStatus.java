@@ -45,8 +45,11 @@ public class PartialStatus {
     @SerializedName("err")
     Integer errorState;
 
+    @SerializedName(PropertyKeys.FORCE_STATE)
+    Integer forceState;
+
     @SerializedName(PropertyKeys.FORCE_SINGLE_PHASE)
-    Boolean chargingSinglePhase;
+    Boolean forceSinglePhase;
 
     @SerializedName(PropertyKeys.STARTING_POWER)
     Float startingPower;
@@ -88,12 +91,25 @@ public class PartialStatus {
     }
 
     /**
+     * Get the enforced charging state of the wallbox, i.e. whether charging is forcefully enabled,
+     * disabled, or nothing is enforced.
+     *
+     * @return
+     */
+    public EnforcedChargingState getEnforcedChargingState() {
+        if (forceState == null) {
+            return null;
+        }
+        return EnforcedChargingState.fromValue(forceState);
+    }
+
+    /**
      * Whether single phase charging is currently used.
      *
      * @return
      */
     public Boolean isChargingSinglePhase() {
-        return chargingSinglePhase;
+        return forceSinglePhase;
     }
 
     /**

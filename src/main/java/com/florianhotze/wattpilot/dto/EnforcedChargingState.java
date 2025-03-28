@@ -20,21 +20,34 @@
 package com.florianhotze.wattpilot.dto;
 
 /**
- * Constants for property keys in the WebSocket API. See <a
- * href="https://github.com/joscha82/wattpilot/blob/main/API.md">joscha82/wattpilot: Wattpilot API
- * Description</a>.
+ * Enum for the enforced charging state configuration.
  *
  * @author Florian Hotze - Initial contribution
  */
-public final class PropertyKeys {
-    private PropertyKeys() {}
+public enum EnforcedChargingState {
+    /** No enforced charging state, i.e. let the wallbox decide (default). */
+    NEUTRAL(0),
+    /** Disallow charging. */
+    OFF(1),
+    /** Force charging. */
+    ON(2);
 
-    public static final String ALLOW_CHARGING = "alw";
-    public static final String CHARGING_CURRENT = "amp";
-    public static final String CAR_STATE = "car";
-    public static final String FORCE_STATE = "frc";
-    public static final String FORCE_SINGLE_PHASE = "fsp";
-    public static final String STARTING_POWER = "fst";
-    public static final String LOGIC_MODE = "lmo";
-    public static final String CHARGING_ENERGY = "nrg";
+    private final int value;
+
+    EnforcedChargingState(int value) {
+        this.value = value;
+    }
+
+    public int toValue() {
+        return value;
+    }
+
+    public static EnforcedChargingState fromValue(int value) {
+        for (EnforcedChargingState state : EnforcedChargingState.values()) {
+            if (state.value == value) {
+                return state;
+            }
+        }
+        return null;
+    }
 }

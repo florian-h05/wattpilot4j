@@ -19,32 +19,29 @@
  */
 package com.florianhotze.wattpilot.commands;
 
+import com.florianhotze.wattpilot.dto.EnforcedChargingState;
 import com.florianhotze.wattpilot.dto.PropertyKeys;
 
 /**
- * Command to set the charging power threshold of the wallbox for {@link
- * com.florianhotze.wattpilot.dto.ChargingMode#ECO}.
+ * Command to set the enforced charging state of the wallbox.
  *
  * @author Florian Hotze - Initial contribution
  */
-public class SetChargingPowerThresholdCommand extends Command {
-    private final CommandValue<Float> value;
+public class SetEnforcedChargingStateCommand extends Command {
+    private final CommandValue<EnforcedChargingState> state;
 
     /**
-     * Create a new charging power threshold command.
+     * Create a new enforced charging state command.
      *
-     * @param threshold the charging power threshold in kW between 1.4 and 22.0
+     * @param state the enforced charging state
      */
-    public SetChargingPowerThresholdCommand(float threshold) {
-        super(PropertyKeys.STARTING_POWER);
-        if (threshold <= 1.39 || threshold >= 22.0) {
-            throw new IllegalArgumentException("Threshold must be between 1.4 and 22.0 kW");
-        }
-        this.value = new CommandValue<>(threshold * 1000);
+    public SetEnforcedChargingStateCommand(EnforcedChargingState state) {
+        super(PropertyKeys.FORCE_STATE);
+        this.state = new CommandValue<>(state);
     }
 
     @Override
-    public CommandValue<?> getValue() {
-        return value;
+    public CommandValue<EnforcedChargingState> getValue() {
+        return state;
     }
 }

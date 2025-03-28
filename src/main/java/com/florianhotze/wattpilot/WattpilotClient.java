@@ -428,6 +428,10 @@ public class WattpilotClient {
                 wattpilotStatus.setStartingPower(status.getStartingPower());
                 hasChanged = true;
             }
+            if (status.getEnforcedChargingState() != null) {
+                wattpilotStatus.setEnforcedState(status.getEnforcedChargingState());
+                hasChanged = true;
+            }
             if (status.isChargingSinglePhase() != null) {
                 wattpilotStatus.setChargingSinglePhase(status.isChargingSinglePhase());
                 hasChanged = true;

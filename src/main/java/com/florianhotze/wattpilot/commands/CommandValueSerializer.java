@@ -20,6 +20,7 @@
 package com.florianhotze.wattpilot.commands;
 
 import com.florianhotze.wattpilot.dto.ChargingMode;
+import com.florianhotze.wattpilot.dto.EnforcedChargingState;
 
 import java.lang.reflect.Type;
 
@@ -39,6 +40,8 @@ public class CommandValueSerializer implements JsonSerializer<CommandValue<?>> {
             CommandValue<?> commandValue, Type type, JsonSerializationContext context) {
         if (commandValue.value() instanceof ChargingMode cm) {
             return new JsonPrimitive(cm.toValue());
+        } else if (commandValue.value() instanceof EnforcedChargingState es) {
+            return new JsonPrimitive(es.toValue());
         } else {
             return context.serialize(commandValue.value());
         }

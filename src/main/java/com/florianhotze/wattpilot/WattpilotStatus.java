@@ -22,6 +22,7 @@ package com.florianhotze.wattpilot;
 import com.florianhotze.wattpilot.dto.CarState;
 import com.florianhotze.wattpilot.dto.ChargingMetrics;
 import com.florianhotze.wattpilot.dto.ChargingMode;
+import com.florianhotze.wattpilot.dto.EnforcedChargingState;
 
 /**
  * Class providing the current configuration & status of the Wattpilot.
@@ -32,6 +33,7 @@ public class WattpilotStatus {
     private boolean chargingAllowed;
     private int chargingCurrent;
     private CarState carState;
+    private EnforcedChargingState enforcedState;
     private boolean chargingSinglePhase;
     private float startingPower;
     private ChargingMode chargingMode;
@@ -74,6 +76,16 @@ public class WattpilotStatus {
     }
 
     /**
+     * Get the enforced charging state of the wallbox, i.e. whether charging forcefully enabled,
+     * disabled, or the nothing is enforced.
+     *
+     * @return the enforced state
+     */
+    public EnforcedChargingState getEnforcedChargingState() {
+        return enforcedState;
+    }
+
+    /**
      * Whether single phase charging is currently used.
      *
      * @return whether single phase charging is used
@@ -110,6 +122,10 @@ public class WattpilotStatus {
 
     void setCarState(CarState carState) {
         this.carState = carState;
+    }
+
+    void setEnforcedState(EnforcedChargingState enforcedState) {
+        this.enforcedState = enforcedState;
     }
 
     void setChargingSinglePhase(boolean chargingSinglePhase) {
