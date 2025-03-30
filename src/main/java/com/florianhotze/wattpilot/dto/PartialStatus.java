@@ -79,15 +79,15 @@ public class PartialStatus {
     }
 
     /**
-     * Get the state of the car.
+     * Get the charging state.
      *
      * @return
      */
-    public CarState getCarState() {
+    public ChargingState getChargingState() {
         if (carState == null) {
             return null;
         }
-        return CarState.fromValue(carState);
+        return ChargingState.fromValue(carState);
     }
 
     /**

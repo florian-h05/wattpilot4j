@@ -19,7 +19,7 @@
  */
 package com.florianhotze.wattpilot;
 
-import com.florianhotze.wattpilot.dto.CarState;
+import com.florianhotze.wattpilot.dto.ChargingState;
 import com.florianhotze.wattpilot.dto.ChargingMetrics;
 import com.florianhotze.wattpilot.dto.ChargingMode;
 import com.florianhotze.wattpilot.dto.EnforcedChargingState;
@@ -32,7 +32,7 @@ import com.florianhotze.wattpilot.dto.EnforcedChargingState;
 public class WattpilotStatus {
     private boolean chargingAllowed;
     private int chargingCurrent;
-    private CarState carState;
+    private ChargingState chargingState;
     private EnforcedChargingState enforcedState;
     private boolean chargingSinglePhase;
     private float startingPower;
@@ -58,12 +58,12 @@ public class WattpilotStatus {
     }
 
     /**
-     * Get the current state of the (connected) car.
+     * Get the current charging state.
      *
-     * @return the current state of the car
+     * @return the current charging state
      */
-    public CarState getCarState() {
-        return carState;
+    public ChargingState getChargingState() {
+        return chargingState;
     }
 
     /**
@@ -120,8 +120,8 @@ public class WattpilotStatus {
         this.chargingCurrent = chargingCurrent;
     }
 
-    void setCarState(CarState carState) {
-        this.carState = carState;
+    void setChargingState(ChargingState chargingState) {
+        this.chargingState = chargingState;
     }
 
     void setEnforcedState(EnforcedChargingState enforcedState) {

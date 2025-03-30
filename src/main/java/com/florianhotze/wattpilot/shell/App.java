@@ -136,7 +136,7 @@ public class App implements WattpilotClientListener {
                         "  Charging Power Threshold: %.1f kW", status.getChargingPowerThreshold()));
 
         System.out.println("Status:");
-        System.out.println("  Car Status: " + status.getCarState());
+        System.out.println("  Charging State: " + status.getChargingState());
         System.out.println("  Charging Allowed: " + status.isChargingAllowed());
         System.out.println("  Single Phase Charging: " + status.isChargingSinglePhase());
         System.out.println("  Charging Metrics: " + status.getChargingMetrics());

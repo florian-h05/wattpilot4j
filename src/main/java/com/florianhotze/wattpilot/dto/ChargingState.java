@@ -20,11 +20,11 @@
 package com.florianhotze.wattpilot.dto;
 
 /**
- * Enum for the state of the connected car.
+ * Enum for the charging state.
  *
  * @author Florian Hotze - Initial contribution
  */
-public enum CarState {
+public enum ChargingState {
     NO_CAR(1),
     CHARGING(2),
     READY(3),
@@ -32,7 +32,7 @@ public enum CarState {
 
     private final int value;
 
-    CarState(int value) {
+    ChargingState(int value) {
         this.value = value;
     }
 
@@ -40,8 +40,8 @@ public enum CarState {
         return value;
     }
 
-    static CarState fromValue(int value) {
-        for (CarState state : CarState.values()) {
+    static ChargingState fromValue(int value) {
+        for (ChargingState state : ChargingState.values()) {
             if (state.value == value) {
                 return state;
             }
