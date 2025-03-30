@@ -19,9 +19,9 @@
  */
 package com.florianhotze.wattpilot;
 
-import com.florianhotze.wattpilot.dto.ChargingState;
 import com.florianhotze.wattpilot.dto.ChargingMetrics;
 import com.florianhotze.wattpilot.dto.ChargingMode;
+import com.florianhotze.wattpilot.dto.ChargingState;
 import com.florianhotze.wattpilot.dto.EnforcedChargingState;
 
 /**
@@ -33,11 +33,13 @@ public class WattpilotStatus {
     private boolean chargingAllowed;
     private int chargingCurrent;
     private ChargingState chargingState;
+    private Integer chargingDuration;
     private EnforcedChargingState enforcedState;
     private boolean chargingSinglePhase;
     private float startingPower;
     private ChargingMode chargingMode;
     private ChargingMetrics chargingMetrics;
+    private Double energyCounterSinceStart;
 
     /**
      * Whether charging is currently allowed.
@@ -64,6 +66,16 @@ public class WattpilotStatus {
      */
     public ChargingState getChargingState() {
         return chargingState;
+    }
+
+    /**
+     * Get the duration of the active charging session in seconds. If none is active, the duration
+     * of the last session is returned.
+     *
+     * @return the duration of the active or the last charging session
+     */
+    public Integer getChargingDuration() {
+        return chargingDuration;
     }
 
     /**
@@ -112,6 +124,16 @@ public class WattpilotStatus {
         return chargingMetrics;
     }
 
+    /**
+     * Get the energy counter in kWh since the start of the current charging session. If no session
+     * is active, the counter since the start of the last session is returned.
+     *
+     * @return the energy counter of the current or the last charging session
+     */
+    public Double getEnergyCounterSinceStart() {
+        return energyCounterSinceStart;
+    }
+
     void setChargingAllowed(boolean chargingAllowed) {
         this.chargingAllowed = chargingAllowed;
     }
@@ -122,6 +144,10 @@ public class WattpilotStatus {
 
     void setChargingState(ChargingState chargingState) {
         this.chargingState = chargingState;
+    }
+
+    void setEnergyCounterSinceStart(Double energyCounterSinceStart) {
+        this.energyCounterSinceStart = energyCounterSinceStart;
     }
 
     void setEnforcedState(EnforcedChargingState enforcedState) {
@@ -142,5 +168,9 @@ public class WattpilotStatus {
 
     void setChargingMetrics(ChargingMetrics chargingMetrics) {
         this.chargingMetrics = chargingMetrics;
+    }
+
+    void setChargingDuration(Integer chargingDuration) {
+        this.chargingDuration = chargingDuration;
     }
 }

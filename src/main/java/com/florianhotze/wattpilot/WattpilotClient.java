@@ -424,6 +424,10 @@ public class WattpilotClient {
                 wattpilotStatus.setChargingState(status.getChargingState());
                 hasChanged = true;
             }
+            if (status.getChargingDuration() != null) {
+                wattpilotStatus.setChargingDuration(status.getChargingDuration());
+                hasChanged = true;
+            }
             if (status.getStartingPower() != null) {
                 wattpilotStatus.setStartingPower(status.getStartingPower());
                 hasChanged = true;
@@ -442,6 +446,10 @@ public class WattpilotClient {
             }
             if (status.getChargingMetrics() != null) {
                 wattpilotStatus.setChargingMetrics(status.getChargingMetrics());
+                hasChanged = true;
+            }
+            if (status.getEnergyCounterSinceStart() != null) {
+                wattpilotStatus.setEnergyCounterSinceStart(status.getEnergyCounterSinceStart());
                 hasChanged = true;
             }
         }

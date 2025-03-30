@@ -39,8 +39,8 @@ public class PartialStatus {
     @SerializedName(PropertyKeys.CAR_STATE)
     Integer carState;
 
-    @SerializedName("cdi")
-    Object chargingDuration;
+    @SerializedName(PropertyKeys.CHARGING_DURATION)
+    ChargingDuration chargingDuration;
 
     @SerializedName("err")
     Integer errorState;
@@ -59,6 +59,9 @@ public class PartialStatus {
 
     @SerializedName(PropertyKeys.CHARGING_ENERGY)
     Integer[] chargingEnergy;
+
+    @SerializedName(PropertyKeys.ENERGY_COUNTER_SINCE_START)
+    Double energyCounterSinceStart;
 
     /**
      * Check if charging is currently allowed.
@@ -88,6 +91,19 @@ public class PartialStatus {
             return null;
         }
         return ChargingState.fromValue(carState);
+    }
+
+    /**
+     * Get the duration of the active charging session in seconds. If none is active, the duration
+     * of the last session is returned.
+     *
+     * @return
+     */
+    public Integer getChargingDuration() {
+        if (chargingDuration == null || chargingDuration.type() != 1) {
+            return null;
+        }
+        return chargingDuration.value() / 1000;
     }
 
     /**
@@ -146,5 +162,18 @@ public class PartialStatus {
             return null;
         }
         return new ChargingMetrics(chargingEnergy);
+    }
+
+    /**
+     * Get the energy counter in kWh since the start of the current charging session. If no session
+     * is active, the counter since the start of the last charging session is returned.
+     *
+     * @return
+     */
+    public Double getEnergyCounterSinceStart() {
+        if (energyCounterSinceStart == null) {
+            return null;
+        }
+        return energyCounterSinceStart * 0.001d;
     }
 }
