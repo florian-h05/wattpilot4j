@@ -106,6 +106,18 @@ public class WattpilotClient {
     }
 
     /**
+     * Create a new Fronius Wattpilot client using the given {@link HttpClient} and idle timeout.
+     *
+     * @param httpClient the HTTP client to use, allows configuring HTTP settings
+     * @param idleTimeout the maximum time in milliseconds that a connection can be idle before it
+     *     is closed
+     */
+    public WattpilotClient(HttpClient httpClient, long idleTimeout) {
+        this.client = new WebSocketClient(httpClient);
+        client.setMaxIdleTimeout(idleTimeout);
+    }
+
+    /**
      * Adds a {@link WattpilotClientListener} to the client.
      *
      * @param listener the listener to add
@@ -277,7 +289,7 @@ public class WattpilotClient {
         @Override
         public void onWebSocketClose(int code, String reason) {
             logger.trace("onWebSocketClose {} {}", code, reason);
-            onDisconnected(reason);
+            onDisconnected(reason, null);
         }
 
         @Override
@@ -289,7 +301,7 @@ public class WattpilotClient {
         @Override
         public void onWebSocketError(Throwable error) {
             logger.debug("onWebSocketError", error);
-            onDisconnected(error.getMessage());
+            onDisconnected(error.getMessage(), error);
         }
 
         @Override
@@ -352,7 +364,7 @@ public class WattpilotClient {
             if (m instanceof AuthErrorMessage rm) {
                 logger.trace("Received AuthErrorMessage");
                 logger.error("Authentication failed: {}", rm.message);
-                onDisconnected(rm.message);
+                onDisconnected(rm.message, null);
             }
 
             if (m instanceof FullStatusMessage fsm) {
@@ -390,7 +402,8 @@ public class WattpilotClient {
         }
     }
 
-    private void onDisconnected(String reason) { // NOSONAR: we want to keep this method here
+    private void onDisconnected(
+            String reason, Throwable t) { // NOSONAR: we want to keep this method here
         isAuthenticated = false;
         if (session != null && session.isOpen()) {
             session.close();
@@ -399,7 +412,7 @@ public class WattpilotClient {
         synchronized (listeners) {
             for (WattpilotClientListener listener : listeners) {
                 if (listener != null) {
-                    listener.disconnected(reason);
+                    listener.disconnected(reason, t);
                 }
             }
         }

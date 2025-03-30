@@ -68,7 +68,7 @@ public class App implements WattpilotClientListener {
 
         try {
             HttpClient httpClient = new HttpClient();
-            client = new WattpilotClient(httpClient);
+            client = new WattpilotClient(httpClient, 30 * 1000);
             client.addListener(this);
             client.connect(host, password);
         } catch (IOException e) {
@@ -112,7 +112,7 @@ public class App implements WattpilotClientListener {
     }
 
     @Override
-    public void disconnected(String reason) {
+    public void disconnected(String reason, Throwable cause) {
         System.out.println("Wallbox disconnected: " + reason);
     }
 

@@ -32,8 +32,10 @@ public interface WattpilotClientListener {
      * Called when the client disconnected from the wallbox.
      *
      * @param reason the reason for the disconnection
+     * @param cause the throwable that caused the disconnect or <code>null</code> if no throwable
+     *     disconnected the client
      */
-    void disconnected(String reason);
+    void disconnected(String reason, Throwable cause);
 
     /**
      * Called when the client receives a status change from the wallbox.
