@@ -27,6 +27,11 @@ package com.florianhotze.wattpilot.commands;
 public abstract class Command {
     private final String key;
 
+    /**
+     * Create a new command with the given key.
+     *
+     * @param key the key of the property to set with the command
+     */
     Command(String key) {
         this.key = key;
     }
@@ -35,7 +40,7 @@ public abstract class Command {
      * Returns the key of the command. See {@link com.florianhotze.wattpilot.dto.PropertyKeys} for a
      * list of all common keys.
      *
-     * @return
+     * @return the key
      */
     public String getKey() {
         return key;
@@ -44,7 +49,7 @@ public abstract class Command {
     /**
      * Returns the value of the command wrapped in a {@link CommandValue}.
      *
-     * @return
+     * @return the value
      */
     public abstract CommandValue<?> getValue();
 }

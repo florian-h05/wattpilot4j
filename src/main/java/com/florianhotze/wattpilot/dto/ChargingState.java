@@ -25,9 +25,13 @@ package com.florianhotze.wattpilot.dto;
  * @author Florian Hotze - Initial contribution
  */
 public enum ChargingState {
+    /** No car connected. */
     NO_CAR(1),
+    /** Car connected and charging. */
     CHARGING(2),
+    /** Car connected and ready to charge, but not charging at the moment. */
     READY(3),
+    /** Car connected and charging completed. */
     COMPLETE(4);
 
     private final int value;
@@ -36,10 +40,21 @@ public enum ChargingState {
         this.value = value;
     }
 
+    /**
+     * Get the API value of the charging state.
+     *
+     * @return the API value
+     */
     public int toValue() {
         return value;
     }
 
+    /**
+     * Get the charging state from the API value.
+     *
+     * @param value the API value
+     * @return the charging state
+     */
     static ChargingState fromValue(int value) {
         for (ChargingState state : ChargingState.values()) {
             if (state.value == value) {

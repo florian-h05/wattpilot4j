@@ -38,10 +38,21 @@ public enum EnforcedChargingState {
         this.value = value;
     }
 
+    /**
+     * Get the API value of the enforced charging state.
+     *
+     * @return the API value
+     */
     public int toValue() {
         return value;
     }
 
+    /**
+     * Get the enforced charging state from the API value.
+     *
+     * @param value the API value
+     * @return the enforced charging state
+     */
     public static EnforcedChargingState fromValue(int value) {
         for (EnforcedChargingState state : EnforcedChargingState.values()) {
             if (state.value == value) {

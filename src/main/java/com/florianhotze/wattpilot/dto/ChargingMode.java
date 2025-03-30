@@ -25,8 +25,17 @@ package com.florianhotze.wattpilot.dto;
  * @author Florian Hotze - Initial contribution
  */
 public enum ChargingMode {
+    /** Default charging mode, i.e. charge with the configured current. */
     DEFAULT(3),
+    /**
+     * Eco charging mode, i.e. charge with solar power sur-plus or if the dynamic electricity tariff
+     * is under the configured threshold.
+     */
     ECO(4),
+    /**
+     * Similar to {@link #ECO}, but ensures the car is charged with a specified amount of energy by
+     * a set time.
+     */
     NEXT_TRIP(5);
 
     private final int value;
@@ -35,10 +44,21 @@ public enum ChargingMode {
         this.value = value;
     }
 
+    /**
+     * Get the API value of the charging mode.
+     *
+     * @return the API value
+     */
     public int toValue() {
         return value;
     }
 
+    /**
+     * Get the charging mode from the API value.
+     *
+     * @param value the API value
+     * @return the charging mode
+     */
     static ChargingMode fromValue(int value) {
         for (ChargingMode mode : ChargingMode.values()) {
             if (mode.value == value) {

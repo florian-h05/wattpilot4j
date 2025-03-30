@@ -25,7 +25,7 @@ import com.florianhotze.wattpilot.dto.ChargingState;
 import com.florianhotze.wattpilot.dto.EnforcedChargingState;
 
 /**
- * Class providing the current configuration & status of the Wattpilot.
+ * Class providing the current configuration and status of the Wattpilot.
  *
  * @author Florian Hotze - Initial contribution
  */
@@ -40,6 +40,9 @@ public class WattpilotStatus {
     private ChargingMode chargingMode;
     private ChargingMetrics chargingMetrics;
     private Double energyCounterSinceStart;
+
+    /** Create a new Wattpilot status. */
+    protected WattpilotStatus() {}
 
     /**
      * Whether charging is currently allowed.

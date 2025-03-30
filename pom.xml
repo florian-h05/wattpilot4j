@@ -107,6 +107,23 @@
           </execution>
         </executions>
       </plugin>
+      <!-- JavaDoc Plugin to attach JavaDoc as JAR -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.11.2</version>
+        <configuration>
+          <doclint>-accessibility,-html,-reference,-syntax</doclint>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Assembly Plugin to build an assembly JAR of the shell app -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

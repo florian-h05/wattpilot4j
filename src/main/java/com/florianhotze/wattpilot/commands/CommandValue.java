@@ -24,5 +24,6 @@ package com.florianhotze.wattpilot.commands;
  * serializing the actual value.
  *
  * @param <T> the type of the value
+ * @param value the value
  */
 public record CommandValue<T>(T value) {}

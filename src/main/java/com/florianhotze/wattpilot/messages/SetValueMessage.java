@@ -32,6 +32,14 @@ public class SetValueMessage extends OutgoingMessage {
     public final String key;
     public final CommandValue<?> value;
 
+    /**
+     * Creates a new SetValueMessage.
+     *
+     * @param requestId the request id, must start with 0 for a new client connection and increment
+     *     by 1 for each message
+     * @param key the key of the property to change
+     * @param value the new value
+     */
     SetValueMessage(int requestId, String key, CommandValue<?> value) {
         super(MessageType.SET_VALUE);
         this.requestId = requestId;
@@ -39,6 +47,14 @@ public class SetValueMessage extends OutgoingMessage {
         this.value = value;
     }
 
+    /**
+     * Creates a new SetValueMessage from a command.
+     *
+     * @param requestId the request id, must start with 0 for a new client connection and increment
+     *     by 1 for each message
+     * @param command the command to create the message from
+     * @return the new SetValueMessage
+     */
     public static SetValueMessage fromCommand(int requestId, Command command) {
         return new SetValueMessage(requestId, command.getKey(), command.getValue());
     }
