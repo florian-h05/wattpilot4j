@@ -150,8 +150,7 @@ public class App implements WattpilotClientListener {
         System.out.println("  Charging Allowed: " + status.isChargingAllowed());
         System.out.println("  Single Phase Charging: " + status.isChargingSinglePhase());
         System.out.println("  Charging Metrics: " + status.getChargingMetrics());
-        System.out.printf("  Charging Duration: %d sec%n", status.getChargingDuration());
-        System.out.printf("  Charged Energy: %.2f Wh%n", status.getEnergyCounterSinceStart());
+        System.out.printf("  Charged Energy: %.0f Wh%n", status.getEnergyCounterSinceStart());
     }
 
     private static void handleCommand(String line, WattpilotClient client) {

@@ -33,7 +33,6 @@ public class WattpilotStatus {
     private boolean chargingAllowed;
     private int chargingCurrent;
     private ChargingState chargingState;
-    private Integer chargingDuration;
     private EnforcedChargingState enforcedState;
     private boolean chargingSinglePhase;
     private float startingPower;
@@ -69,16 +68,6 @@ public class WattpilotStatus {
      */
     public ChargingState getChargingState() {
         return chargingState;
-    }
-
-    /**
-     * Get the duration of the active charging session in seconds. If none is active, the duration
-     * of the last session is returned.
-     *
-     * @return the duration of the active or the last charging session
-     */
-    public Integer getChargingDuration() {
-        return chargingDuration;
     }
 
     /**
@@ -172,9 +161,5 @@ public class WattpilotStatus {
 
     void setChargingMetrics(ChargingMetrics chargingMetrics) {
         this.chargingMetrics = chargingMetrics;
-    }
-
-    void setChargingDuration(Integer chargingDuration) {
-        this.chargingDuration = chargingDuration;
     }
 }

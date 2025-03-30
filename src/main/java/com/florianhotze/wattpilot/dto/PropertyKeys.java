@@ -32,7 +32,6 @@ public final class PropertyKeys {
     public static final String ALLOW_CHARGING = "alw";
     public static final String CHARGING_CURRENT = "amp";
     public static final String CAR_STATE = "car";
-    public static final String CHARGING_DURATION = "cdi";
     public static final String FORCE_STATE = "frc";
     public static final String FORCE_SINGLE_PHASE = "fsp";
     public static final String STARTING_POWER = "fst";

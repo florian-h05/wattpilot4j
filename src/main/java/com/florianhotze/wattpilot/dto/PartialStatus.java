@@ -39,9 +39,6 @@ public class PartialStatus {
     @SerializedName(PropertyKeys.CAR_STATE)
     Integer carState;
 
-    @SerializedName(PropertyKeys.CHARGING_DURATION)
-    ChargingDuration chargingDuration;
-
     @SerializedName("err")
     Integer errorState;
 
@@ -91,19 +88,6 @@ public class PartialStatus {
             return null;
         }
         return ChargingState.fromValue(carState);
-    }
-
-    /**
-     * Get the duration of the active charging session in seconds. If none is active, the duration
-     * of the last session is returned.
-     *
-     * @return
-     */
-    public Integer getChargingDuration() {
-        if (chargingDuration == null || chargingDuration.type() != 1) {
-            return null;
-        }
-        return chargingDuration.value() / 1000;
     }
 
     /**

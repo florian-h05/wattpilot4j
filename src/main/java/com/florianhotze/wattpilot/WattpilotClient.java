@@ -428,10 +428,6 @@ public class WattpilotClient {
                 wattpilotStatus.setChargingState(status.getChargingState());
                 hasChanged = true;
             }
-            if (status.getChargingDuration() != null) {
-                wattpilotStatus.setChargingDuration(status.getChargingDuration());
-                hasChanged = true;
-            }
             if (status.getStartingPower() != null) {
                 wattpilotStatus.setStartingPower(status.getStartingPower());
                 hasChanged = true;
