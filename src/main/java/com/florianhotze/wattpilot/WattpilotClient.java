@@ -127,11 +127,13 @@ public class WattpilotClient {
         if (session != null && session.isOpen()) {
             throw new IOException("Can not connect on already connected session");
         }
+        logger.debug("Connecting to wallbox at {}", host);
         connectWebsocket(host, password);
     }
 
     /** Disconnect the client from the wallbox. */
     public void disconnect() {
+        logger.debug("Disconnecting from wallbox at {}", session.getRemoteAddress());
         if (isConnected()) {
             session.close();
         }
@@ -286,7 +288,7 @@ public class WattpilotClient {
 
         @Override
         public void onWebSocketError(Throwable error) {
-            logger.trace("onWebSocketError", error);
+            logger.debug("onWebSocketError", error);
             onDisconnected(error.getMessage());
         }
 
@@ -390,7 +392,9 @@ public class WattpilotClient {
 
     private void onDisconnected(String reason) { // NOSONAR: we want to keep this method here
         isAuthenticated = false;
-        session.close();
+        if (session != null && session.isOpen()) {
+            session.close();
+        }
         // notify listeners
         synchronized (listeners) {
             for (WattpilotClientListener listener : listeners) {
