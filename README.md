@@ -17,6 +17,13 @@ Compile and run the shell with:
 ./mvnw clean compile exec:java -P shell "-Dexec.args=YOUR_WALLBOX_IP YOUR_WALLBOX_PASSWORD"
 ```
 
+You can optionally configure logging by providing `org.slf4j.simpleLogger.log` system properties on the command line, e.g.:
+
+```
+-Dorg.slf4j.simpleLogger.defaultLogLevel=info
+-Dorg.slf4j.simpleLogger.log.com.florianhotze=debug
+```
+
 ## Disclaimer
 This project is not affiliated with, endorsed by, or supported by Fronius International GmbH.
 "Fronius" and "Wattpilot" are trademarks or registered trademarks of Fronius International GmbH.
