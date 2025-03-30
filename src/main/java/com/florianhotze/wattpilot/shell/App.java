@@ -122,6 +122,11 @@ public class App implements WattpilotClientListener {
     }
 
     private static void printStatus(WattpilotInfo info, WattpilotStatus status) {
+        if (info == null || status == null) {
+            System.err.println("Failed to get status");
+            return;
+        }
+
         System.out.println("Wattpilot Device Info:");
         System.out.println("  Wallbox: " + info.friendlyName());
         System.out.println("  Serial Number: " + info.serial());
