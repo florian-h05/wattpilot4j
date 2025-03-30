@@ -56,6 +56,10 @@ public class App implements WattpilotClientListener {
      * @param args
      */
     public static void main(String[] args) {
+        if (args.length != 2) {
+            System.err.println("Please provide host and password arguments.");
+            System.exit(-1);
+        }
         new App(args[0], args[1]);
     }
 
@@ -93,6 +97,8 @@ public class App implements WattpilotClientListener {
                 } else {
                     System.err.println("Invalid command: " + line);
                 }
+            } else {
+                System.err.println("Unknown command: " + line);
             }
         }
         client.disconnect();

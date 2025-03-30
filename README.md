@@ -11,14 +11,8 @@ Many thanks for the great work!
 The shell provides an easy way to interact with the Wattpilot wallbox without writing any code.
 It allows to get the status and control some charging settings such as mode, current and power threshold.
 
-Compile the shell with:
+Compile and run the shell with:
 
 ```shell
-./mvnw clean compile assembly:single
-```
-
-Run the shell with:
-
-```shell
-java -cp target/wattpilot4j-*-jar-with-dependencies.jar com.florianhotze.wattpilot.shell.App YOUR_WALLBOX_IP YOUR_WALLBOX_PASSWORD
+./mvnw clean compile exec:java -P shell "-Dexec.args=YOUR_WALLBOX_IP YOUR_WALLBOX_PASSWORD"
 ```
