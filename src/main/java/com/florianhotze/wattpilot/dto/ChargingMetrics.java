@@ -22,16 +22,16 @@ package com.florianhotze.wattpilot.dto;
 /**
  * Record for charging metrics.
  *
- * @param power total power in kilowatts
- * @param voltage1 phase 1 voltage in volts
- * @param voltage2 phase 2 voltage in volts
- * @param voltage3 phase 3 voltage in volts
- * @param amperage1 phase 1 amperage in amperes
- * @param amperage2 phase 2 amperage in amperes
- * @param amperage3 phase 3 amperage in amperes
- * @param power1 power of phase 1 in kilowatts
- * @param power2 power of phase 2 in kilowatts
- * @param power3 power of phase 3 in kilowatts
+ * @param power total power in watts (W)
+ * @param voltage1 phase 1 voltage in volts (V)
+ * @param voltage2 phase 2 voltage in volts (V)
+ * @param voltage3 phase 3 voltage in volts (V)
+ * @param amperage1 phase 1 amperage in amperes (A)
+ * @param amperage2 phase 2 amperage in amperes (A)
+ * @param amperage3 phase 3 amperage in amperes (A)
+ * @param power1 power of phase 1 in watts (W)
+ * @param power2 power of phase 2 in watts (W)
+ * @param power3 power of phase 3 in watts (W)
  * @author Florian Hotze - Initial contribution
  */
 public record ChargingMetrics(
@@ -47,24 +47,24 @@ public record ChargingMetrics(
         float power3) {
     ChargingMetrics(Integer[] chargingEnergy) {
         this(
-                chargingEnergy[11] * 0.001f,
+                chargingEnergy[11],
                 chargingEnergy[0],
                 chargingEnergy[1],
                 chargingEnergy[2],
                 chargingEnergy[4],
                 chargingEnergy[5],
                 chargingEnergy[6],
-                chargingEnergy[7] * 0.001f,
-                chargingEnergy[8] * 0.001f,
-                chargingEnergy[9] * 0.001f);
+                chargingEnergy[7],
+                chargingEnergy[8],
+                chargingEnergy[9]);
     }
 
     @Override
     public String toString() {
         return String.format(
-                "ChargingMetrics[power=%.1f kW, voltage1=%d V, voltage2=%d V, voltage3=%d V,"
-                    + " amperage1=%d A, amperage2=%d A, amperage3=%d A, power1=%.1f kW, power2=%.1f"
-                    + " kW, power3=%.1f kW]",
+                "ChargingMetrics[power=%.0f W, voltage1=%d V, voltage2=%d V, voltage3=%d V,"
+                    + " amperage1=%d A, amperage2=%d A, amperage3=%d A, power1=%.0f W, power2=%.0f"
+                    + " W, power3=%.0f W]",
                 power, voltage1, voltage2, voltage3, amperage1, amperage2, amperage3, power1,
                 power2, power3);
     }

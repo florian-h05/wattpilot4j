@@ -129,7 +129,7 @@ public class PartialStatus {
     }
 
     /**
-     * Starting power in kilowatts. This is the minimum power at which charging can be started.
+     * Starting power in watts (W). This is the minimum power at which charging can be started.
      *
      * @return
      */
@@ -137,7 +137,7 @@ public class PartialStatus {
         if (startingPower == null) {
             return null;
         }
-        return startingPower * 0.001f;
+        return startingPower;
     }
 
     /**
@@ -165,8 +165,8 @@ public class PartialStatus {
     }
 
     /**
-     * Get the energy counter in kWh since the start of the current charging session. If no session
-     * is active, the counter since the start of the last charging session is returned.
+     * Get the energy counter in watt-hours (Wh) since the start of the current charging session. If
+     * no session is active, the counter since the start of the last charging session is returned.
      *
      * @return
      */
@@ -174,6 +174,6 @@ public class PartialStatus {
         if (energyCounterSinceStart == null) {
             return null;
         }
-        return energyCounterSinceStart * 0.001d;
+        return energyCounterSinceStart;
     }
 }

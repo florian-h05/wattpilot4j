@@ -82,9 +82,10 @@ public class WattpilotStatus {
     }
 
     /**
-     * Get the configured charging power threshold, i.e. the power at which charging starts.
+     * Get the configured charging power threshold in watts (W), i.e. the power at which charging
+     * starts.
      *
-     * @return the configured charging power threshold in kW
+     * @return the configured charging power threshold
      */
     public float getChargingPowerThreshold() {
         return startingPower;
@@ -128,8 +129,8 @@ public class WattpilotStatus {
     }
 
     /**
-     * Get the energy counter in kWh since the start of the current charging session. If no session
-     * is active, the counter since the start of the last session is returned.
+     * Get the energy counter in watt-hours (Wh) since the start of the current charging session. If
+     * no session is active, the counter since the start of the last session is returned.
      *
      * @return the energy counter of the current or the last charging session
      */

@@ -33,14 +33,14 @@ public class SetChargingPowerThresholdCommand extends Command {
     /**
      * Create a new charging power threshold command.
      *
-     * @param threshold the charging power threshold in kW between 1.4 and 22.0
+     * @param threshold the charging power threshold in watts (W) between 1400 W and 22000 W
      */
     public SetChargingPowerThresholdCommand(float threshold) {
         super(PropertyKeys.STARTING_POWER);
-        if (threshold <= 1.39 || threshold >= 22.0) {
-            throw new IllegalArgumentException("Threshold must be between 1.4 and 22.0 kW");
+        if (threshold < 1400 || threshold >= 22000) {
+            throw new IllegalArgumentException("Threshold must be between 1400 and 22000 W");
         }
-        this.value = new CommandValue<>(threshold * 1000);
+        this.value = new CommandValue<>(threshold);
     }
 
     @Override

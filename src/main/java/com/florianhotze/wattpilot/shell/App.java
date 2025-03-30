@@ -123,7 +123,7 @@ public class App implements WattpilotClientListener {
         System.out.println("  set force <state> - set the enforced charging state (ON, OFF, NONE)");
         System.out.println("  set mode <mode> - set the charging mode (DEFAULT, ECO, NEXT_TRIP)");
         System.out.println(
-                "  set threshold <threshold> - set the charging power threshold in kW [1.4-22.0]");
+                "  set threshold <threshold> - set the charging power threshold in W [1400-22000]");
         System.out.println("  q, quit, e, exit - quit the shell");
     }
 
@@ -143,7 +143,7 @@ public class App implements WattpilotClientListener {
         System.out.println("  Charging Mode: " + status.getChargingMode());
         System.out.println("  Charging Current: " + status.getChargingCurrent() + " A");
         System.out.printf(
-                "  Charging Power Threshold: %.1f kW%n", status.getChargingPowerThreshold());
+                "  Charging Power Threshold: %.0f W%n", status.getChargingPowerThreshold());
 
         System.out.println("Status:");
         System.out.println("  Charging State: " + status.getChargingState());
@@ -151,7 +151,7 @@ public class App implements WattpilotClientListener {
         System.out.println("  Single Phase Charging: " + status.isChargingSinglePhase());
         System.out.println("  Charging Metrics: " + status.getChargingMetrics());
         System.out.printf("  Charging Duration: %d sec%n", status.getChargingDuration());
-        System.out.printf("  Charged Energy: %.2f kWh%n", status.getEnergyCounterSinceStart());
+        System.out.printf("  Charged Energy: %.2f Wh%n", status.getEnergyCounterSinceStart());
     }
 
     private static void handleCommand(String line, WattpilotClient client) {
