@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.florianhotze.sdk</groupId>
+  <groupId>com.github.florian-h05</groupId>
   <artifactId>wattpilot4j</artifactId>
   <version>0.1.0-SNAPSHOT</version>
 
@@ -29,13 +29,6 @@
     <developerConnection>scm:git:ssh://github.com/florian-h05/wattpilot4j.git</developerConnection>
     <url>https://github.com/florian-h05/wattpilot4j</url>
   </scm>
-
-  <distributionManagement>
-    <snapshotRepository>
-      <id>github</id>
-      <url>https://maven.pkg.github.com/florian-h05/wattpilot4j</url>
-    </snapshotRepository>
-  </distributionManagement>
 
   <properties>
     <enforcer-plugin.version>3.5.0</enforcer-plugin.version>

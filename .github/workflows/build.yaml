@@ -3,7 +3,7 @@ name: CI Build
 on:
   workflow_dispatch:
   push:
-    # Build and publish snapshot:
+    # Build snapshot:
     branches: ["main"]
     paths-ignore: ["**/*.md"]
     # Build release:
@@ -20,10 +20,6 @@ jobs:
     name: Maven Build
 
     runs-on: "ubuntu-24.04"
-
-    permissions:
-      contents: read
-      packages: write
 
     steps:
       - name: Checkout repository
@@ -65,10 +61,3 @@ jobs:
         run: |
           echo "::error::Files have changed: $CHANGED_FILES"
           exit 1
-
-      - name: Publish package
-        if: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
-        shell: bash
-        run: "./mvnw -B --show-version --file pom.xml deploy"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
