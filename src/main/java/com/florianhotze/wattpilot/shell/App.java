@@ -143,7 +143,7 @@ public class App implements WattpilotClientListener {
         System.out.println("  Charging Mode: " + status.getChargingMode());
         System.out.println("  Charging Current: " + status.getChargingCurrent() + " A");
         System.out.printf(
-                "  Charging Power Threshold: %.0f W%n", status.getChargingPowerThreshold());
+                "  PV Surplus Power Threshold: %.0f W%n", status.getSurplusPowerThreshold());
 
         System.out.println("Status:");
         System.out.println("  Charging State: " + status.getChargingState());

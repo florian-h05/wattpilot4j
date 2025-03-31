@@ -113,11 +113,12 @@ public class PartialStatus {
     }
 
     /**
-     * Starting power in watts (W). This is the minimum power at which charging can be started.
+     * PV surplus power threshold in watts (W). This is the minimum solar surplus power at which
+     * o´solar surplus charging can be started.
      *
      * @return
      */
-    public Float getStartingPower() {
+    public Float getSurplusPowerThreshold() {
         if (startingPower == null) {
             return null;
         }

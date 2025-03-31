@@ -441,8 +441,8 @@ public class WattpilotClient {
                 wattpilotStatus.setChargingState(status.getChargingState());
                 hasChanged = true;
             }
-            if (status.getStartingPower() != null) {
-                wattpilotStatus.setStartingPower(status.getStartingPower());
+            if (status.getSurplusPowerThreshold() != null) {
+                wattpilotStatus.setSurplusPowerThreshold(status.getSurplusPowerThreshold());
                 hasChanged = true;
             }
             if (status.getEnforcedChargingState() != null) {

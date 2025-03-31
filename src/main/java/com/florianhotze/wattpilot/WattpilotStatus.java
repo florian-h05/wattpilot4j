@@ -35,7 +35,7 @@ public class WattpilotStatus {
     private ChargingState chargingState;
     private EnforcedChargingState enforcedState;
     private boolean chargingSinglePhase;
-    private float startingPower;
+    private float surplusPowerThreshold;
     private ChargingMode chargingMode;
     private ChargingMetrics chargingMetrics;
     private Double energyCounterSinceStart;
@@ -71,13 +71,13 @@ public class WattpilotStatus {
     }
 
     /**
-     * Get the configured charging power threshold in watts (W), i.e. the power at which charging
-     * starts.
+     * Get the configured PV surplus power threshold in watts (W), i.e. the solar power surplus at
+     * which solar surplus charging starts.
      *
-     * @return the configured charging power threshold
+     * @return the configured PV surplus power threshold
      */
-    public float getChargingPowerThreshold() {
-        return startingPower;
+    public float getSurplusPowerThreshold() {
+        return surplusPowerThreshold;
     }
 
     /**
@@ -151,8 +151,8 @@ public class WattpilotStatus {
         this.chargingSinglePhase = chargingSinglePhase;
     }
 
-    void setStartingPower(float startingPower) {
-        this.startingPower = startingPower;
+    void setSurplusPowerThreshold(float surplusPowerThreshold) {
+        this.surplusPowerThreshold = surplusPowerThreshold;
     }
 
     void setChargingMode(ChargingMode chargingMode) {
