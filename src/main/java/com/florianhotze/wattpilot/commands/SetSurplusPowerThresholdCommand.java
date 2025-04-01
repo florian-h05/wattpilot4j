@@ -22,20 +22,21 @@ package com.florianhotze.wattpilot.commands;
 import com.florianhotze.wattpilot.dto.PropertyKeys;
 
 /**
- * Command to set the charging power threshold of the wallbox for {@link
- * com.florianhotze.wattpilot.dto.ChargingMode#ECO}.
+ * Command to set the PV surplus power threshold of the wallbox for {@link
+ * com.florianhotze.wattpilot.dto.ChargingMode#ECO} and {@link
+ * com.florianhotze.wattpilot.dto.ChargingMode#NEXT_TRIP}.
  *
  * @author Florian Hotze - Initial contribution
  */
-public class SetChargingPowerThresholdCommand extends Command {
+public class SetSurplusPowerThresholdCommand extends Command {
     private final CommandValue<Float> value;
 
     /**
-     * Create a new charging power threshold command.
+     * Create a new PV surplus power threshold command.
      *
-     * @param threshold the charging power threshold in watts (W) between 1400 W and 22000 W
+     * @param threshold the PV surplus power threshold in watts (W) between 1400 W and 22000 W
      */
-    public SetChargingPowerThresholdCommand(float threshold) {
+    public SetSurplusPowerThresholdCommand(float threshold) {
         super(PropertyKeys.STARTING_POWER);
         if (threshold < 1400 || threshold >= 22000) {
             throw new IllegalArgumentException("Threshold must be between 1400 and 22000 W");

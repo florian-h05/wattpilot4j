@@ -28,13 +28,13 @@ public enum ChargingMode {
     /** Default charging mode, i.e. charge with the configured current. */
     DEFAULT(3),
     /**
-     * Eco charging mode, i.e. charge with solar power sur-plus or if the dynamic electricity tariff
+     * Eco charging mode, i.e. charge with solar power surplus or if the dynamic electricity tariff
      * is under the configured threshold.
      */
     ECO(4),
     /**
-     * Similar to {@link #ECO}, but ensures the car is charged with a specified amount of energy by
-     * a set time.
+     * Similar to {@link #ECO}, but additionally ensures the car is charged with a specified amount
+     * of energy by a set time by using grid power if necessary.
      */
     NEXT_TRIP(5);
 

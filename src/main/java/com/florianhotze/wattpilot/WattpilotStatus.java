@@ -72,7 +72,8 @@ public class WattpilotStatus {
 
     /**
      * Get the configured PV surplus power threshold in watts (W), i.e. the solar power surplus at
-     * which solar surplus charging starts.
+     * which solar surplus charging starts in {@link ChargingMode#ECO} and {@link
+     * ChargingMode#NEXT_TRIP}.
      *
      * @return the configured PV surplus power threshold
      */
