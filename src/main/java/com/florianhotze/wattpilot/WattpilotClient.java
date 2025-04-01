@@ -465,6 +465,10 @@ public class WattpilotClient {
                 wattpilotStatus.setEnergyCounterSinceStart(status.getEnergyCounterSinceStart());
                 hasChanged = true;
             }
+            if (status.getEnergyCounterTotal() != null) {
+                wattpilotStatus.setEnergyCounterTotal(status.getEnergyCounterTotal());
+                hasChanged = true;
+            }
         }
         if (isInitialized
                 && hasChanged) { // only notify if status has been updated by a delta message, i.e.

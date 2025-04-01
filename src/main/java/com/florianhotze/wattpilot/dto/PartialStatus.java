@@ -39,6 +39,9 @@ public class PartialStatus {
     @SerializedName(PropertyKeys.CAR_STATE)
     Integer carState;
 
+    @SerializedName(PropertyKeys.ENERGY_COUNTER_TOTAL)
+    Integer energyCounterTotal;
+
     @SerializedName("err")
     Integer errorState;
 
@@ -88,6 +91,15 @@ public class PartialStatus {
             return null;
         }
         return ChargingState.fromValue(carState);
+    }
+
+    /**
+     * Get the total energy counter in watt-hours (Wh).
+     *
+     * @return
+     */
+    public Integer getEnergyCounterTotal() {
+        return energyCounterTotal;
     }
 
     /**
@@ -156,9 +168,6 @@ public class PartialStatus {
      * @return
      */
     public Double getEnergyCounterSinceStart() {
-        if (energyCounterSinceStart == null) {
-            return null;
-        }
         return energyCounterSinceStart;
     }
 }

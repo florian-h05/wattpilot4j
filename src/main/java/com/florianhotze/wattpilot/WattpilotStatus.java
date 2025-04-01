@@ -39,6 +39,7 @@ public class WattpilotStatus {
     private ChargingMode chargingMode;
     private ChargingMetrics chargingMetrics;
     private Double energyCounterSinceStart;
+    private Integer energyCounterTotal;
 
     /** Create a new Wattpilot status. */
     protected WattpilotStatus() {}
@@ -128,6 +129,15 @@ public class WattpilotStatus {
         return energyCounterSinceStart;
     }
 
+    /**
+     * Get the total energy counter in watt-hours (Wh).
+     *
+     * @return the total energy counter
+     */
+    public Integer getEnergyCounterTotal() {
+        return energyCounterTotal;
+    }
+
     void setChargingAllowed(boolean chargingAllowed) {
         this.chargingAllowed = chargingAllowed;
     }
@@ -162,5 +172,9 @@ public class WattpilotStatus {
 
     void setChargingMetrics(ChargingMetrics chargingMetrics) {
         this.chargingMetrics = chargingMetrics;
+    }
+
+    void setEnergyCounterTotal(Integer energyCounterTotal) {
+        this.energyCounterTotal = energyCounterTotal;
     }
 }

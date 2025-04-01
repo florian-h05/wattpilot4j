@@ -151,6 +151,7 @@ public class App implements WattpilotClientListener {
         System.out.println("  Single Phase Charging: " + status.isChargingSinglePhase());
         System.out.println("  Charging Metrics: " + status.getChargingMetrics());
         System.out.printf("  Charged Energy: %.0f Wh%n", status.getEnergyCounterSinceStart());
+        System.out.printf("  Total Charged Energy: %d Wh%n", status.getEnergyCounterTotal());
     }
 
     private static void handleCommand(String line, WattpilotClient client) {
