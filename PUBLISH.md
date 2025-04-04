@@ -36,7 +36,7 @@ Then, configure in `~/.m2/settings.xml`:
 Use the `local-sign` Maven profile to locally sign the build artifacts:
 
 ```shell
-mvn clean package -P local-sign
+./mvnw clean package -P local-sign
 ```
 
 ### Configure Maven Central Repository Credentials
@@ -48,8 +48,8 @@ Follow <https://central.sonatype.org/publish/publish-portal-maven/#credentials> 
 Create a new release:
 
 ```shell
-mvn release:prepare
-mvn release:clean
+./mvnw release:prepare
+./mvnw release:clean
 ```
 
 Checkout the Git tag of the release:
@@ -61,7 +61,7 @@ git checkout vX.Y.Z
 Then publish through the following command:
 
 ```shell
-mvn deploy -P central
+./mvnw clean deploy -P central
 ```
 
 The output will provide a link to <https://central.sonatype.com/publishing/deployments>, where you can publish the deployment.
