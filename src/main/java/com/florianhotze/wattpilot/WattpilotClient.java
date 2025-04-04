@@ -52,6 +52,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -291,7 +292,9 @@ public class WattpilotClient {
                 scheduler.schedule(
                         () -> {
                             logger.warn("Ping to {} timed out", session.getRemoteAddress());
-                            onDisconnected("Ping timed out", null);
+                            onDisconnected(
+                                    "Ping timed out",
+                                    new TimeoutException("No pong received before ping timed out"));
                         },
                         pingTimeout,
                         TimeUnit.SECONDS);
@@ -474,7 +477,7 @@ public class WattpilotClient {
     }
 
     private void onDisconnected(
-            String reason, Throwable t) { // NOSONAR: we want to keep this method here
+            String reason, Throwable cause) { // NOSONAR: we want to keep this method here
         isAuthenticated = false;
         cancelPingTask();
         if (session != null && session.isOpen()) {
@@ -490,7 +493,7 @@ public class WattpilotClient {
         synchronized (listeners) {
             for (WattpilotClientListener listener : listeners) {
                 if (listener != null) {
-                    listener.disconnected(reason, t);
+                    listener.disconnected(reason, cause);
                 }
             }
         }
