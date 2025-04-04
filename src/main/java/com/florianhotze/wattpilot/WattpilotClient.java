@@ -482,6 +482,7 @@ public class WattpilotClient {
         cancelPingTask();
         if (session != null && session.isOpen()) {
             session.close();
+            session = null;
         }
         // complete all pending futures exceptionally
         responseFutures.forEach(
