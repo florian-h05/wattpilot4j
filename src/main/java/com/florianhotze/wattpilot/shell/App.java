@@ -34,6 +34,7 @@ import com.florianhotze.wattpilot.dto.EnforcedChargingState;
 
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -45,8 +46,10 @@ import org.eclipse.jetty.client.HttpClient;
  *
  * @author Florian Hotze - Initial contribution
  */
+@SuppressWarnings({"squid:S106", "squid:S2142", "CallToPrintStackTrace"})
 public class App implements WattpilotClientListener {
     private WattpilotClient client;
+    private final CompletableFuture<?> awaitConnected = new CompletableFuture<>();
 
     /**
      * Main method to start the shell application.
@@ -71,7 +74,8 @@ public class App implements WattpilotClientListener {
             client = new WattpilotClient(httpClient, 10, 2);
             client.addListener(this);
             client.connect(host, password);
-        } catch (IOException e) {
+            awaitConnected.get(2, TimeUnit.SECONDS);
+        } catch (IOException | TimeoutException | InterruptedException | ExecutionException e) {
             System.err.println("Failed to connect to wallbox: " + e.getMessage());
             e.printStackTrace();
             scanner.close();
@@ -79,7 +83,7 @@ public class App implements WattpilotClientListener {
         }
 
         String line;
-        while (true) {
+        while (client.isConnected()) {
             line = scanner.nextLine();
             if (line == null || line.equals("h") || line.equals("help")) {
                 printHelp();
@@ -108,12 +112,20 @@ public class App implements WattpilotClientListener {
 
     @Override
     public void connected() {
+        awaitConnected.complete(null);
         System.out.println("Wallbox connected");
     }
 
     @Override
     public void disconnected(String reason, Throwable cause) {
-        System.out.println("Wallbox disconnected: " + reason);
+        if (!awaitConnected.isDone()) {
+            awaitConnected.completeExceptionally(cause);
+        }
+        if (reason != null) {
+            System.out.println("Wallbox disconnected: " + reason);
+        } else {
+            System.out.println("Wallbox disconnected");
+        }
     }
 
     private static void printHelp() {
@@ -165,7 +177,7 @@ public class App implements WattpilotClientListener {
                                         EnforcedChargingState.valueOf(parts[2]));
                         case "mode" -> new SetChargingModeCommand(ChargingMode.valueOf(parts[2]));
                         case "threshold" ->
-                                new SetSurplusPowerThresholdCommand(Float.valueOf(parts[2]));
+                                new SetSurplusPowerThresholdCommand(Float.parseFloat(parts[2]));
                         default -> null;
                     };
             if (command != null) {
