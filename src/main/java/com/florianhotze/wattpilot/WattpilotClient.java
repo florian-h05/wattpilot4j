@@ -63,6 +63,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
@@ -312,7 +313,13 @@ public class WattpilotClient {
         @Override
         public void onWebSocketText(String message) {
             logger.trace("onWebSocketText {}", message);
-            Message m = gson.fromJson(message, Message.class);
+            Message m;
+            try {
+                m = gson.fromJson(message, Message.class);
+            } catch (JsonSyntaxException e) {
+                logger.warn("Could not parse message {} to JSON", message);
+                return;
+            }
 
             if (m == null) {
                 return;
