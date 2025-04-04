@@ -18,8 +18,9 @@ on:
 jobs:
   maven:
     name: Maven Build
-
     runs-on: "ubuntu-24.04"
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
