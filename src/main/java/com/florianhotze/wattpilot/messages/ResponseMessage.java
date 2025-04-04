@@ -28,8 +28,16 @@ import com.florianhotze.wattpilot.dto.PartialStatus;
  * @author Florian Hotze - Initial contribution
  */
 public class ResponseMessage extends IncomingMessage {
-    public String requestId;
+    /** Whether the previous request was successful. */
     public boolean success;
+
+    /** Message what went wrong in case of failure. */
+    public String message;
+
+    /** Request id in case of success. */
+    public String requestId;
+
+    /** Partial status containing the changed key in case of success. */
     public PartialStatus status;
 
     ResponseMessage() {

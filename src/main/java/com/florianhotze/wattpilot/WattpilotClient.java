@@ -48,6 +48,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -66,17 +70,27 @@ import org.slf4j.LoggerFactory;
  * @author Florian Hotze - Initial contribution
  */
 public class WattpilotClient {
+    private static final String PING_MESSAGE = "{\"type\":\"PING\"}";
+    private static final String PONG_RESPONSE_MESSAGE = "unknown message type=\"PING\"";
+
     private final Logger logger = LoggerFactory.getLogger(WattpilotClient.class);
     private final Gson gson =
             new GsonBuilder()
                     .registerTypeAdapter(Message.class, new MessageDeserializer())
                     .registerTypeAdapter(CommandValue.class, new CommandValueSerializer())
                     .create();
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
     private final Set<WattpilotClientListener> listeners = new HashSet<>();
     private final WebSocketClient client;
     private final WattpilotStatus wattpilotStatus = new WattpilotStatus();
     private final Map<String, CompletableFuture<CommandResponse>> responseFutures =
             new ConcurrentHashMap<>();
+
+    private final long pingInterval;
+    private final long pingTimeout;
+    private ScheduledFuture<?> pingTask;
+    private ScheduledFuture<?> timeoutTask;
 
     private Session session;
     private boolean isAuthenticated = false;
@@ -92,18 +106,25 @@ public class WattpilotClient {
      */
     public WattpilotClient(HttpClient httpClient) {
         this.client = new WebSocketClient(httpClient);
+        pingInterval = 30;
+        pingTimeout = 3;
     }
 
     /**
-     * Create a new Fronius Wattpilot client using the given {@link HttpClient} and idle timeout.
+     * Creates a new Fronius Wattpilot client using the given {@link HttpClient} and the provided
+     * ping interval and timeout.
      *
      * @param httpClient the HTTP client to use, allows configuring HTTP settings
-     * @param idleTimeout the maximum time in milliseconds that a connection can be idle before it
-     *     is closed
+     * @param pingInterval the ping interval
+     * @param pingTimeout the ping timeout, must be less than <code>pingInterval</code>
      */
-    public WattpilotClient(HttpClient httpClient, long idleTimeout) {
+    public WattpilotClient(HttpClient httpClient, int pingInterval, int pingTimeout) {
         this.client = new WebSocketClient(httpClient);
-        client.setMaxIdleTimeout(idleTimeout);
+        if (pingTimeout >= pingInterval) {
+            throw new IllegalArgumentException("pingTimeout must be less than pingInterval");
+        }
+        this.pingInterval = pingInterval;
+        this.pingTimeout = pingTimeout;
     }
 
     /**
@@ -134,8 +155,8 @@ public class WattpilotClient {
 
     /** Disconnect the client from the wallbox. */
     public void disconnect() {
-        logger.debug("Disconnecting from wallbox at {}", session.getRemoteAddress());
         if (isConnected()) {
+            logger.debug("Disconnecting from wallbox at {}", session.getRemoteAddress());
             session.close();
         }
     }
@@ -228,6 +249,52 @@ public class WattpilotClient {
         }
 
         client.connect(new FroniusWebsocketListener(password), uri);
+    }
+
+    private void cancelPingTask() {
+        if (pingTask != null) {
+            pingTask.cancel(false);
+            pingTask = null;
+        }
+        cancelTimeoutTask();
+    }
+
+    private void schedulePingTask() {
+        cancelPingTask();
+        pingTask =
+                scheduler.scheduleAtFixedRate(
+                        () -> {
+                            try {
+                                logger.debug("Sending PING message");
+                                session.getRemote().sendString(PING_MESSAGE);
+                                scheduleTimeoutTask();
+                            } catch (IOException e) {
+                                logger.error("Failed to send ping message", e);
+                                onDisconnected("Failed to send ping message", e);
+                            }
+                        },
+                        pingInterval,
+                        pingInterval,
+                        TimeUnit.SECONDS);
+    }
+
+    private void cancelTimeoutTask() {
+        if (timeoutTask != null) {
+            timeoutTask.cancel(false);
+            timeoutTask = null;
+        }
+    }
+
+    private void scheduleTimeoutTask() {
+        cancelTimeoutTask();
+        timeoutTask =
+                scheduler.schedule(
+                        () -> {
+                            logger.warn("Ping to {} timed out", session.getRemoteAddress());
+                            onDisconnected("Ping timed out", null);
+                        },
+                        pingTimeout,
+                        TimeUnit.SECONDS);
     }
 
     /**
@@ -328,7 +395,9 @@ public class WattpilotClient {
                                 hm.version,
                                 hm.protocol,
                                 hm.secured);
-                logger.debug(wattpilotInfo.toString());
+                if (logger.isDebugEnabled()) {
+                    logger.debug(wattpilotInfo.toString());
+                }
                 if (!wattpilotInfo.secured()) {
                     isAuthenticated = true;
                     onConnected();
@@ -379,6 +448,12 @@ public class WattpilotClient {
 
             if (m instanceof ResponseMessage rm) {
                 logger.trace("Received ResponseMessage");
+                if (!rm.success && rm.message.equals(PONG_RESPONSE_MESSAGE)) {
+                    logger.debug("Received PONG response");
+                    cancelTimeoutTask();
+                    return;
+                }
+
                 CompletableFuture<CommandResponse> future = responseFutures.remove(rm.requestId);
                 if (future != null) {
                     future.complete(new CommandResponse(rm.success, rm.status));
@@ -388,6 +463,7 @@ public class WattpilotClient {
     }
 
     private void onConnected() { // NOSONAR: we want to keep this method here
+        schedulePingTask();
         synchronized (listeners) {
             for (WattpilotClientListener listener : listeners) {
                 if (listener != null) {
@@ -400,9 +476,16 @@ public class WattpilotClient {
     private void onDisconnected(
             String reason, Throwable t) { // NOSONAR: we want to keep this method here
         isAuthenticated = false;
+        cancelPingTask();
         if (session != null && session.isOpen()) {
             session.close();
         }
+        // complete all pending futures exceptionally
+        responseFutures.forEach(
+                (key, future) -> {
+                    future.completeExceptionally(new IOException("Client disconnected"));
+                    responseFutures.remove(key);
+                });
         // notify listeners
         synchronized (listeners) {
             for (WattpilotClientListener listener : listeners) {
@@ -411,12 +494,6 @@ public class WattpilotClient {
                 }
             }
         }
-        // complete all pending futures exceptionally
-        responseFutures.forEach(
-                (key, future) -> {
-                    future.completeExceptionally(new IOException("Client disconnected"));
-                    responseFutures.remove(key);
-                });
     }
 
     private void onStatus(PartialStatus status) { // NOSONAR: we want to keep this method here

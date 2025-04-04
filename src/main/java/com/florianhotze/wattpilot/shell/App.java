@@ -68,7 +68,7 @@ public class App implements WattpilotClientListener {
 
         try {
             HttpClient httpClient = new HttpClient();
-            client = new WattpilotClient(httpClient, 30 * 1000);
+            client = new WattpilotClient(httpClient, 10, 2);
             client.addListener(this);
             client.connect(host, password);
         } catch (IOException e) {
