@@ -61,6 +61,7 @@ import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
 import org.eclipse.jetty.websocket.api.WriteCallback;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -338,6 +339,7 @@ public class WattpilotClient {
     }
 
     /** Handles incoming WebSocket messages from the wallbox. */
+    @WebSocket
     private class FroniusWebsocketListener implements WebSocketListener {
         private final String password;
 
