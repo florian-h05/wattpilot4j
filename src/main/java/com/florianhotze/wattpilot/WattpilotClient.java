@@ -480,7 +480,9 @@ public class WattpilotClient {
 
     private void onConnected() { // NOSONAR: we want to keep this method here
         schedulePingTask();
-        connectedFuture.complete(null);
+        if (!connectedFuture.isDone()) {
+            connectedFuture.complete(null);
+        }
         synchronized (listeners) {
             for (WattpilotClientListener listener : listeners) {
                 if (listener != null) {
