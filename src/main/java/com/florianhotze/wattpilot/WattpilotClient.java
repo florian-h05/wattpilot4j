@@ -143,6 +143,17 @@ public class WattpilotClient {
     }
 
     /**
+     * Removes a {@link WattpilotClientListener} from the client.
+     *
+     * @param listener the listener to remove
+     */
+    public void removeListener(WattpilotClientListener listener) {
+        synchronized (listeners) {
+            listeners.remove(listener);
+        }
+    }
+
+    /**
      * Connect the client to the wallbox.
      *
      * <p>Connection is established asynchronously. Either use the returned {@link
