@@ -89,6 +89,8 @@ public class WattpilotClient {
     private final Map<String, CompletableFuture<CommandResponse>> responseFutures =
             new ConcurrentHashMap<>();
 
+    private CompletableFuture<Void> connectedFuture = null;
+
     private final long pingInterval;
     private final long pingTimeout;
     private ScheduledFuture<?> pingTask;
@@ -145,14 +147,15 @@ public class WattpilotClient {
      *
      * @param host the hostname or IP address of the wallbox
      * @param password the password to authenticate with
+     * @return future that completes once the client has successfully connected
      * @throws IOException if the connection fails
      */
-    public void connect(String host, String password) throws IOException {
+    public CompletableFuture<Void> connect(String host, String password) throws IOException {
         if (session != null && session.isOpen()) {
             throw new IOException("Can not connect on already connected session");
         }
         logger.debug("Connecting to wallbox at {}", host);
-        connectWebsocket(host, password);
+        return connectWebsocket(host, password);
     }
 
     /** Disconnect the client from the wallbox. */
@@ -235,7 +238,8 @@ public class WattpilotClient {
      * @param password the password to authenticate with
      * @throws IOException if the connection fails
      */
-    private void connectWebsocket(String host, String password) throws IOException {
+    private CompletableFuture<Void> connectWebsocket(String host, String password)
+            throws IOException {
         URI uri;
         try {
             uri = new URI(String.format("ws://%s/ws", host));
@@ -250,7 +254,9 @@ public class WattpilotClient {
             throw new IOException("Failed to start WebSocket client", e);
         }
 
+        connectedFuture = new CompletableFuture<>();
         client.connect(new FroniusWebsocketListener(password), uri);
+        return connectedFuture;
     }
 
     private void cancelPingTask() {
@@ -469,6 +475,7 @@ public class WattpilotClient {
 
     private void onConnected() { // NOSONAR: we want to keep this method here
         schedulePingTask();
+        connectedFuture.complete(null);
         synchronized (listeners) {
             for (WattpilotClientListener listener : listeners) {
                 if (listener != null) {
@@ -485,6 +492,10 @@ public class WattpilotClient {
         if (session != null && session.isOpen()) {
             session.close();
             session = null;
+        }
+        // complete connection future exceptionally
+        if (!connectedFuture.isDone()) {
+            connectedFuture.completeExceptionally(cause != null ? cause : new IOException(reason));
         }
         // complete all pending futures exceptionally
         responseFutures.forEach(

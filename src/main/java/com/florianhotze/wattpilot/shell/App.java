@@ -34,7 +34,6 @@ import com.florianhotze.wattpilot.dto.EnforcedChargingState;
 
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -49,7 +48,6 @@ import org.eclipse.jetty.client.HttpClient;
 @SuppressWarnings({"squid:S106", "squid:S2142", "CallToPrintStackTrace"})
 public class App implements WattpilotClientListener {
     private WattpilotClient client;
-    private final CompletableFuture<?> awaitConnected = new CompletableFuture<>();
 
     /**
      * Main method to start the shell application.
@@ -73,8 +71,7 @@ public class App implements WattpilotClientListener {
             HttpClient httpClient = new HttpClient();
             client = new WattpilotClient(httpClient, 10, 2);
             client.addListener(this);
-            client.connect(host, password);
-            awaitConnected.get(2, TimeUnit.SECONDS);
+            client.connect(host, password).get(3, TimeUnit.SECONDS);
         } catch (IOException | TimeoutException | InterruptedException | ExecutionException e) {
             System.err.println("Failed to connect to wallbox: " + e.getMessage());
             e.printStackTrace();
@@ -112,15 +109,11 @@ public class App implements WattpilotClientListener {
 
     @Override
     public void connected() {
-        awaitConnected.complete(null);
         System.out.println("Wallbox connected");
     }
 
     @Override
     public void disconnected(String reason, Throwable cause) {
-        if (!awaitConnected.isDone()) {
-            awaitConnected.completeExceptionally(cause);
-        }
         if (reason != null) {
             System.out.println("Wallbox disconnected: " + reason);
         } else {
