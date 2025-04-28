@@ -145,10 +145,15 @@ public class WattpilotClient {
     /**
      * Connect the client to the wallbox.
      *
+     * <p>Connection is established asynchronously. Either use the returned {@link
+     * CompletableFuture} or implement {@link WattpilotClientListener#connected()} and {@link
+     * WattpilotClientListener#disconnected} to get notified about connection establishment or
+     * failure.
+     *
      * @param host the hostname or IP address of the wallbox
      * @param password the password to authenticate with
      * @return future that completes once the client has successfully connected
-     * @throws IOException if the connection fails
+     * @throws IOException if the synchronous preparations for connection establishment fail
      */
     public CompletableFuture<Void> connect(String host, String password) throws IOException {
         if (session != null && session.isOpen()) {
