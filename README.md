@@ -2,6 +2,7 @@
 
 `wattpilot4j` is Java (>= 17) client library to interact with [Fronius Wattpilot wallboxes](https://www.fronius.com/en-gb/uk/solar-energy/home-owners/products-and-solutions/e-mobility/wattpilot-electric-car-charger-for-homes), which unfortunately don't provide an official API.
 This client library is based on the undocumented WebSockets API, which is used by the the official Wattpilot.Solar mobile app.
+Check out wattpilot4j‘s [DeepWiki](https://deepwiki.com/florian-h05/wattpilot4j) for documentation.
 
 This implementation is based on the API documentation at [joscha82/wattpilot](https://github.com/joscha82/wattpilot).
 Many thanks for the great work!
@@ -36,7 +37,8 @@ gpg --keyserver keys.openpgp.org --recv-keys F2CB9FE8FD59D83C0816FF0165DED02BE8F
 You only need to implement the [`WattpilotListener`](src/main/java/com/florianhotze/wattpilot/WattpilotClientListener.java) interface to receive connection and disconnect events, as well as status updates,
 and create an instance of the [`WattpilotClient`](src/main/java/com/florianhotze/wattpilot/WattpilotClient.java) class, add your listener and connect to the wallbox through the `connect` method.
 
-As an example, have a look at the [main class of the Wattpilot shell](src/main/java/com/florianhotze/wattpilot/shell/App.java).
+As an example, have a look at the [main class of the Wattpilot shell](src/main/java/com/florianhotze/wattpilot/shell/App.java)
+or the [openHAB Wattpilot Binding](https://github.com/openhab/openhab-addons/tree/main/bundles/org.openhab.binding.froniuswattpilot).
 
 ### OSGi
 
