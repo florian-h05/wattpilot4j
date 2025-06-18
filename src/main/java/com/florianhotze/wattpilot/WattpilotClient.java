@@ -176,9 +176,10 @@ public class WattpilotClient {
 
     /** Disconnect the client from the wallbox. */
     public void disconnect() {
-        if (isConnected()) {
+        if (session != null && session.isOpen()) {
             logger.debug("Disconnecting from wallbox at {}", session.getRemoteAddress());
             session.close();
+            // onDisconnected will be called by the WebsocketListener and perform the clean-up
         }
     }
 
@@ -509,8 +510,8 @@ public class WattpilotClient {
         cancelPingTask();
         if (session != null && session.isOpen()) {
             session.close();
-            session = null;
         }
+        session = null; // make sure to always destroy the session, even if already closed
         // complete connection future exceptionally
         if (!connectedFuture.isDone()) {
             connectedFuture.completeExceptionally(cause != null ? cause : new IOException(reason));
