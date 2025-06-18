@@ -90,6 +90,7 @@ public class WattpilotClient {
             new ConcurrentHashMap<>();
 
     private CompletableFuture<Void> connectedFuture = null;
+    private CompletableFuture<Void> disconnectFuture = null;
 
     private final long pingInterval;
     private final long pingTimeout;
@@ -164,7 +165,7 @@ public class WattpilotClient {
      * @param host the hostname or IP address of the wallbox
      * @param password the password to authenticate with
      * @return future that completes once the client has successfully connected
-     * @throws IOException if the synchronous preparations for connection establishment fail
+     * @throws IOException if the synchronous preparations for the connection establishment fail
      */
     public CompletableFuture<Void> connect(String host, String password) throws IOException {
         if (session != null && session.isOpen()) {
@@ -174,13 +175,23 @@ public class WattpilotClient {
         return connectWebsocket(host, password);
     }
 
-    /** Disconnect the client from the wallbox. */
-    public void disconnect() {
+    /**
+     * Disconnect the client from the wallbox.
+     *
+     * <p>This operation is idempotent, meaning it can be called multiple times without side
+     * effects.
+     *
+     * @return future that completes once the client has successfully disconnected
+     */
+    public CompletableFuture<Void> disconnect() {
         if (session != null && session.isOpen()) {
             logger.debug("Disconnecting from wallbox at {}", session.getRemoteAddress());
             session.close();
             // onDisconnected will be called by the WebsocketListener and perform the clean-up
+            disconnectFuture = new CompletableFuture<>();
+            return disconnectFuture;
         }
+        return CompletableFuture.completedFuture(null);
     }
 
     /**
@@ -492,8 +503,9 @@ public class WattpilotClient {
 
     private void onConnected() { // NOSONAR: we want to keep this method here
         schedulePingTask();
-        if (!connectedFuture.isDone()) {
+        if (connectedFuture != null && !connectedFuture.isDone()) {
             connectedFuture.complete(null);
+            connectedFuture = null;
         }
         synchronized (listeners) {
             for (WattpilotClientListener listener : listeners) {
@@ -513,8 +525,9 @@ public class WattpilotClient {
         }
         session = null; // make sure to always destroy the session, even if already closed
         // complete connection future exceptionally
-        if (!connectedFuture.isDone()) {
+        if (connectedFuture != null && !connectedFuture.isDone()) {
             connectedFuture.completeExceptionally(cause != null ? cause : new IOException(reason));
+            connectedFuture = null;
         }
         // complete all pending futures exceptionally
         responseFutures.forEach(
@@ -529,6 +542,14 @@ public class WattpilotClient {
                     listener.disconnected(reason, cause);
                 }
             }
+        }
+        if (disconnectFuture != null && !disconnectFuture.isDone()) {
+            if (cause != null) {
+                disconnectFuture.completeExceptionally(cause);
+            } else {
+                disconnectFuture.complete(null);
+            }
+            disconnectFuture = null;
         }
     }
 

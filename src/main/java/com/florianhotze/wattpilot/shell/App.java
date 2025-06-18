@@ -102,7 +102,11 @@ public class App implements WattpilotClientListener {
                 System.err.println("Unknown command: " + line);
             }
         }
-        client.disconnect();
+        try {
+            client.disconnect().get(3, TimeUnit.SECONDS);
+        } catch (TimeoutException | InterruptedException | ExecutionException e) {
+            // no handling needed here
+        }
         scanner.close();
         System.exit(0);
     }
