@@ -5,7 +5,7 @@
 
   <groupId>com.florianhotze.sdk</groupId>
   <artifactId>wattpilot4j</artifactId>
-  <version>1.2.1-SNAPSHOT</version>
+  <version>1.3.0</version>
 
   <name>Wattpilot4j</name>
   <description>Client SDK for Fronius Wattpilot wallboxes</description>
@@ -27,7 +27,7 @@
   <scm>
     <connection>scm:git:git://github.com/florian-h05/wattpilot4j.git</connection>
     <developerConnection>scm:git:ssh://github.com/florian-h05/wattpilot4j.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v1.3.0</tag>
     <url>https://github.com/florian-h05/wattpilot4j</url>
   </scm>
 
