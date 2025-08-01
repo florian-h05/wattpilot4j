@@ -4,7 +4,7 @@
 
 ### GPG Signing
 
-One of the requirements for publishing to Maven Central is to sign your artifacts with PGP.
+One of the requirements for publishing to Maven Central is to sign your artefacts with PGP.
 See <https://central.sonatype.org/publish/requirements/gpg/> to learn how to set up GnuPG, generate a key pair and distributing the key.
 
 You need to configure the Maven GPG plugin to use the correct key.

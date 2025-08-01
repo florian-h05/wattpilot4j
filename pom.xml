@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.florianhotze.sdk</groupId>
+  <groupId>dev.digiried</groupId>
   <artifactId>wattpilot4j</artifactId>
   <version>1.3.1-SNAPSHOT</version>
 
@@ -134,7 +134,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>com.florianhotze.wattpilot.shell.App</mainClass>
+              <mainClass>dev.digiried.wattpilot.shell.App</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
@@ -212,7 +212,7 @@
 
             <importOrder>
               <wildcardsLast>true</wildcardsLast>
-              <order>\#com.florianhotze.wattpilot,com.florianhotze.wattpilot,java|javax|jakarta,\#</order>
+              <order>\#dev.digiried.wattpilot,dev.digiried.wattpilot,java|javax|jakarta,\#</order>
               <!-- you can use an empty string for all the imports you didn't specify explicitly, '|' to join group without blank line, and '\#` prefix for static imports. -->
             </importOrder>
           </java>
@@ -283,7 +283,7 @@
             <artifactId>exec-maven-plugin</artifactId>
             <version>3.5.0</version>
             <configuration>
-              <mainClass>com.florianhotze.wattpilot.shell.App</mainClass>
+              <mainClass>dev.digiried.wattpilot.shell.App</mainClass>
             </configuration>
             <executions>
               <execution>

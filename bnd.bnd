@@ -6,8 +6,8 @@ Import-Package:\
     *
 Export-Package:\
   !NOTICE, \
-  com.florianhotze.wattpilot;version=${project.version}, \
-  com.florianhotze.wattpilot.commands;version=${project.version}, \
-  com.florianhotze.wattpilot.dto;version=${project.version}
+  dev.digiried.wattpilot;version=${project.version}, \
+  dev.digiried.wattpilot.commands;version=${project.version}, \
+  dev.digiried.wattpilot.dto;version=${project.version}
 -includeresource: \
   NOTICE
