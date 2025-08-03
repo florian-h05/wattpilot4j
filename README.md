@@ -23,7 +23,7 @@ It is available on Maven Central, so you simply add it to your project by adding
 </dependency>
 ```
 
-Replace `VERSION` with a version available on [Maven Central](https://repo1.maven.org/maven2/com/florianhotze/sdk/wattpilot4j/).
+Replace `VERSION` with a version available on [Maven Central](https://repo1.maven.org/maven2/dev/digiried/wattpilot4j/).
 
 All releases are signed with the PGP key `F2CB9FE8FD59D83C0816FF0165DED02BE8FA21A6`, you can find the public key on [keys.openpgp.org](https://keys.openpgp.org/search?q=F2CB9FE8FD59D83C0816FF0165DED02BE8FA21A6).
 To import the public key, use the following command:
