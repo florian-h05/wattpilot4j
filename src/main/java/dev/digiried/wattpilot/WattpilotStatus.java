@@ -30,12 +30,15 @@ import dev.digiried.wattpilot.dto.EnforcedChargingState;
  * @author Florian Hotze - Initial contribution
  */
 public class WattpilotStatus {
+    private boolean boostEnabled;
+    private int boostSoCLimit;
     private boolean chargingAllowed;
     private int chargingCurrent;
     private ChargingState chargingState;
     private EnforcedChargingState enforcedState;
     private boolean chargingSinglePhase;
     private float surplusPowerThreshold;
+    private int surplusSoCThreshold;
     private ChargingMode chargingMode;
     private ChargingMetrics chargingMetrics;
     private Double energyCounterSinceStart;
@@ -43,6 +46,25 @@ public class WattpilotStatus {
 
     /** Create a new Wattpilot status. */
     protected WattpilotStatus() {}
+
+    /**
+     * Whether charging boost is enabled, i.e. provide additional power from battery or grid in
+     * {@link ChargingMode#ECO} and {@link ChargingMode#NEXT_TRIP}.
+     *
+     * @return whether boost is enabled
+     */
+    public boolean isBoostEnabled() {
+        return boostEnabled;
+    }
+
+    /**
+     * Get the configured battery SoC to discharge the battery to when boost is enabled.
+     *
+     * @return the configured boost battery SoC limit
+     */
+    public int getBoostSoCLimit() {
+        return boostSoCLimit;
+    }
 
     /**
      * Whether charging is currently allowed.
@@ -80,6 +102,16 @@ public class WattpilotStatus {
      */
     public float getSurplusPowerThreshold() {
         return surplusPowerThreshold;
+    }
+
+    /**
+     * Get the configured PV surplus battery SoC threshold in percent (%), i.e. the battery SoC at
+     * which surplus charging starts in {@link ChargingMode#ECO} and {@link ChargingMode#NEXT_TRIP}.
+     *
+     * @return the configured PV surplus battery SoC threshold
+     */
+    public int getSurplusSoCThreshold() {
+        return surplusSoCThreshold;
     }
 
     /**
@@ -138,6 +170,14 @@ public class WattpilotStatus {
         return energyCounterTotal;
     }
 
+    void setBoostEnabled(boolean boostEnabled) {
+        this.boostEnabled = boostEnabled;
+    }
+
+    void setBoostSoCLimit(int boostSoCLimit) {
+        this.boostSoCLimit = boostSoCLimit;
+    }
+
     void setChargingAllowed(boolean chargingAllowed) {
         this.chargingAllowed = chargingAllowed;
     }
@@ -164,6 +204,10 @@ public class WattpilotStatus {
 
     void setSurplusPowerThreshold(float surplusPowerThreshold) {
         this.surplusPowerThreshold = surplusPowerThreshold;
+    }
+
+    void setSurplusSoCThreshold(int surplusSoCThreshold) {
+        this.surplusSoCThreshold = surplusSoCThreshold;
     }
 
     void setChargingMode(ChargingMode chargingMode) {

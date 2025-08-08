@@ -32,11 +32,23 @@ public final class PropertyKeys {
     /** Charging allowed/possible (RO) */
     public static final String ALLOW_CHARGING = "alw";
 
+    /** Charging boost enabled (boost is only available in eco or next trip mode) (RW) */
+    public static final String BOOST_ENABLED = "ebe";
+
+    /**
+     * SoC to discharge the battery to when boost is enabled (boost is only available in eco or next
+     * trip mode) (RW)
+     */
+    public static final String BOOST_BATTERY_SOC = "ebt";
+
     /** Allowed current for charging in ampere (RW) */
     public static final String CHARGING_CURRENT = "amp";
 
     /** State of the charging process (RO) */
     public static final String CAR_STATE = "car";
+
+    /** Error state (RO) */
+    public static final String ERROR_STATE = "err";
 
     /** Total energy counter in watt-hours (RO) */
     public static final String ENERGY_COUNTER_TOTAL = "eto";
@@ -49,6 +61,9 @@ public final class PropertyKeys {
 
     /** Starting power in watt for solar charging (RW) */
     public static final String STARTING_POWER = "fst";
+
+    /** Starting SoC of battery for solar charging (RW) */
+    public static final String STARTING_SOC = "fam";
 
     /** Charging mode (RW) */
     public static final String LOGIC_MODE = "lmo";

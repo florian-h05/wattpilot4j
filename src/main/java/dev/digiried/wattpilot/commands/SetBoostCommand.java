@@ -17,19 +17,27 @@
  * limitations under the License.
  * #L%
  */
-package dev.digiried.wattpilot.messages;
+package dev.digiried.wattpilot.commands;
 
-import dev.digiried.wattpilot.dto.PartialStatus;
+import dev.digiried.wattpilot.dto.PropertyKeys;
 
 /**
- * Delta Status Message. Whenever a property changes, a Delta Status is sent.
+ * Command to enable or disable the charging boost in {@link
+ * dev.digiried.wattpilot.dto.ChargingMode#ECO} or {@link
+ * dev.digiried.wattpilot.dto.ChargingMode#NEXT_TRIP}.
  *
  * @author Florian Hotze - Initial contribution
  */
-public class DeltaStatusMessage extends IncomingMessage {
-    public PartialStatus status;
+public class SetBoostCommand extends Command {
+    private final CommandValue<Boolean> value;
 
-    DeltaStatusMessage() {
-        super(MessageType.DELTA_STATUS);
+    public SetBoostCommand(boolean enabled) {
+        super(PropertyKeys.BOOST_ENABLED);
+        this.value = new CommandValue<>(enabled);
+    }
+
+    @Override
+    public CommandValue<Boolean> getValue() {
+        return value;
     }
 }
