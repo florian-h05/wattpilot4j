@@ -35,7 +35,6 @@ import dev.digiried.wattpilot.commands.SetSurplusSoCThresholdCommand;
 import dev.digiried.wattpilot.dto.ChargingMode;
 import dev.digiried.wattpilot.dto.EnforcedChargingState;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
