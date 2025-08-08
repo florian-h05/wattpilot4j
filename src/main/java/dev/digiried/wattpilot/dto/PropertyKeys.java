@@ -29,14 +29,33 @@ package dev.digiried.wattpilot.dto;
 public final class PropertyKeys {
     private PropertyKeys() {}
 
+    /** Charging allowed/possible (RO) */
     public static final String ALLOW_CHARGING = "alw";
+
+    /** Allowed current for charging in ampere (RW) */
     public static final String CHARGING_CURRENT = "amp";
+
+    /** State of the charging process (RO) */
     public static final String CAR_STATE = "car";
+
+    /** Total energy counter in watt-hours (RO) */
     public static final String ENERGY_COUNTER_TOTAL = "eto";
+
+    /** Enforce a specific charging state (RW) */
     public static final String FORCE_STATE = "frc";
+
+    /** Force-single phase charging (RW?) */
     public static final String FORCE_SINGLE_PHASE = "fsp";
+
+    /** Starting power in watt for solar charging (RW) */
     public static final String STARTING_POWER = "fst";
+
+    /** Charging mode (RW) */
     public static final String LOGIC_MODE = "lmo";
+
+    /** Charging metrics like power, voltage, amperage (RO) */
     public static final String CHARGING_ENERGY = "nrg";
+
+    /** Energy counter since the start of the charging session in watt-hours (RO) */
     public static final String ENERGY_COUNTER_SINCE_START = "wh";
 }
