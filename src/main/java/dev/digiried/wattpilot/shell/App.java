@@ -25,13 +25,17 @@ import dev.digiried.wattpilot.WattpilotInfo;
 import dev.digiried.wattpilot.WattpilotStatus;
 import dev.digiried.wattpilot.commands.Command;
 import dev.digiried.wattpilot.commands.CommandResponse;
+import dev.digiried.wattpilot.commands.SetBoostCommand;
+import dev.digiried.wattpilot.commands.SetBoostSoCLimitCommand;
 import dev.digiried.wattpilot.commands.SetChargingCurrentCommand;
 import dev.digiried.wattpilot.commands.SetChargingModeCommand;
 import dev.digiried.wattpilot.commands.SetEnforcedChargingStateCommand;
 import dev.digiried.wattpilot.commands.SetSurplusPowerThresholdCommand;
+import dev.digiried.wattpilot.commands.SetSurplusSoCThresholdCommand;
 import dev.digiried.wattpilot.dto.ChargingMode;
 import dev.digiried.wattpilot.dto.EnforcedChargingState;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
@@ -126,14 +130,21 @@ public class App implements WattpilotClientListener {
     }
 
     private static void printHelp() {
-        System.out.println("Commands:");
-        System.out.println("  status - get the current status of the wallbox");
-        System.out.println("  set current <current> - set the charging current in A [6-32]");
-        System.out.println("  set force <state> - set the enforced charging state (ON, OFF, NONE)");
-        System.out.println("  set mode <mode> - set the charging mode (DEFAULT, ECO, NEXT_TRIP)");
-        System.out.println(
-                "  set threshold <threshold> - set the charging power threshold in W [1400-22000]");
-        System.out.println("  q, quit, e, exit - quit the shell");
+        System.out.print(
+                """
+wattpilot4j Shell - Copyright (c) 2025 Florian Hotze under Apache License, Version 2.0
+
+Commands:
+  status                                    get the current status of the wallbox
+  set current <current>                     set the charging current in A [6-32]
+  set force <state>                         set the enforced charging state (ON, OFF, NONE)
+  set mode <mode>                           set the charging mode (DEFAULT, ECO, NEXT_TRIP)
+  set boost <enabled>                       enable/disable charging boost in ECO or NEXT_TRIP mode (true, false)
+  set boost_soc_limit                       set the battery SoC limit in % for charging boost [0-100]
+  set surplus_power_threshold <threshold>   set the surplus charging power threshold in W [1400-22000]
+  set surplus_soc_threshold <threshold>     set the surplus charging battery SoC threshold in % [0-100]
+  q, quit, e, exit                          quit the shell
+""");
     }
 
     private static void printStatus(WattpilotInfo info, WattpilotStatus status) {
@@ -151,8 +162,12 @@ public class App implements WattpilotClientListener {
         System.out.println("  Charging Enforced: " + status.getEnforcedChargingState());
         System.out.println("  Charging Mode: " + status.getChargingMode());
         System.out.println("  Charging Current: " + status.getChargingCurrent() + " A");
+        System.out.println("  Charging Boost: " + status.isBoostEnabled());
+        System.out.printf("  Charging Boost Battery SoC Limit: %d %%%n", status.getBoostSoCLimit());
         System.out.printf(
                 "  PV Surplus Power Threshold: %.0f W%n", status.getSurplusPowerThreshold());
+        System.out.printf(
+                "  PV Surplus Battery SoC Threshold: %d %%%n", status.getSurplusSoCThreshold());
 
         System.out.println("Status:");
         System.out.println("  Charging State: " + status.getChargingState());
@@ -173,8 +188,13 @@ public class App implements WattpilotClientListener {
                                 new SetEnforcedChargingStateCommand(
                                         EnforcedChargingState.valueOf(parts[2]));
                         case "mode" -> new SetChargingModeCommand(ChargingMode.valueOf(parts[2]));
-                        case "threshold" ->
+                        case "boost" -> new SetBoostCommand(Boolean.parseBoolean(parts[2]));
+                        case "boost_soc_limit" ->
+                                new SetBoostSoCLimitCommand(Integer.parseInt(parts[2]));
+                        case "surplus_power_threshold" ->
                                 new SetSurplusPowerThresholdCommand(Float.parseFloat(parts[2]));
+                        case "surplus_soc_threshold" ->
+                                new SetSurplusSoCThresholdCommand(Integer.parseInt(parts[2]));
                         default -> null;
                     };
             if (command != null) {

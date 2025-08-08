@@ -35,6 +35,12 @@ public class PartialStatus {
     @SerializedName(PropertyKeys.ALLOW_CHARGING)
     Boolean allowCharging;
 
+    @SerializedName(PropertyKeys.BOOST_ENABLED)
+    Boolean boost;
+
+    @SerializedName(PropertyKeys.BOOST_BATTERY_SOC)
+    Integer boostSoC;
+
     @SerializedName(PropertyKeys.CHARGING_CURRENT)
     Integer chargingCurrent;
 
@@ -44,7 +50,7 @@ public class PartialStatus {
     @SerializedName(PropertyKeys.ENERGY_COUNTER_TOTAL)
     Integer energyCounterTotal;
 
-    @SerializedName("err")
+    @SerializedName(PropertyKeys.ERROR_STATE)
     Integer errorState;
 
     @SerializedName(PropertyKeys.FORCE_STATE)
@@ -55,6 +61,9 @@ public class PartialStatus {
 
     @SerializedName(PropertyKeys.STARTING_POWER)
     Float startingPower;
+
+    @SerializedName(PropertyKeys.STARTING_SOC)
+    Integer startingSoc;
 
     @SerializedName(PropertyKeys.LOGIC_MODE)
     Integer logicMode;
@@ -72,6 +81,24 @@ public class PartialStatus {
      */
     public Boolean isChargingAllowed() {
         return allowCharging;
+    }
+
+    /**
+     * Whether charging boost is enabled in eco or next trip mode.
+     *
+     * @return
+     */
+    public Boolean isBoostEnabled() {
+        return boost;
+    }
+
+    /**
+     * Battery SoC to discharge the battery to when boost is enabled.
+     *
+     * @return
+     */
+    public Integer getBoostSoCLimit() {
+        return boostSoC;
     }
 
     /**
@@ -128,15 +155,22 @@ public class PartialStatus {
 
     /**
      * PV surplus power threshold in watts (W). This is the minimum solar surplus power at which
-     * o´solar surplus charging can be started.
+     * solar surplus charging can be started.
      *
      * @return
      */
     public Float getSurplusPowerThreshold() {
-        if (startingPower == null) {
-            return null;
-        }
         return startingPower;
+    }
+
+    /**
+     * PV surplus battery SoC threshold in percent (%). This is the minimum PV battery SoC at which
+     * solar surplus charging can be started.
+     *
+     * @return
+     */
+    public Integer getSurplusSoCThreshold() {
+        return startingSoc;
     }
 
     /**

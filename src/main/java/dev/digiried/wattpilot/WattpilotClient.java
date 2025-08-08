@@ -562,6 +562,14 @@ public class WattpilotClient {
                 wattpilotStatus.setChargingAllowed(status.isChargingAllowed());
                 hasChanged = true;
             }
+            if (status.isBoostEnabled() != null) {
+                wattpilotStatus.setBoostEnabled(status.isBoostEnabled());
+                hasChanged = true;
+            }
+            if (status.getBoostSoCLimit() != null) {
+                wattpilotStatus.setBoostSoCLimit(status.getBoostSoCLimit());
+                hasChanged = true;
+            }
             if (status.getChargingCurrent() != null) {
                 wattpilotStatus.setChargingCurrent(status.getChargingCurrent());
                 hasChanged = true;
@@ -572,6 +580,10 @@ public class WattpilotClient {
             }
             if (status.getSurplusPowerThreshold() != null) {
                 wattpilotStatus.setSurplusPowerThreshold(status.getSurplusPowerThreshold());
+                hasChanged = true;
+            }
+            if (status.getSurplusSoCThreshold() != null) {
+                wattpilotStatus.setSurplusSoCThreshold(status.getSurplusSoCThreshold());
                 hasChanged = true;
             }
             if (status.getEnforcedChargingState() != null) {
