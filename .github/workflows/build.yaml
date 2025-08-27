@@ -66,4 +66,4 @@ jobs:
       # Upload the full dependency graph to improve quality of Dependabot alerts on pushes to main
       - name: Update dependency graph
         if: github.event_name == 'push' && github.ref_name == 'main'
-        uses: advanced-security/maven-dependency-submission-action@v4
+        uses: advanced-security/maven-dependency-submission-action@v5
