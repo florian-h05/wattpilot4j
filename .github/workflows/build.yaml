@@ -15,8 +15,12 @@ on:
     branches: ["main"]
     paths-ignore: ["**/*.md"]
 
+env:
+  JAVA_DISTRIBUTION: "temurin"
+  JAVA_VERSION: 17
+
 jobs:
-  maven:
+  build:
     name: Maven Build
     runs-on: "ubuntu-24.04"
     permissions:
@@ -38,8 +42,8 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v5
         with:
-          distribution: "temurin"
-          java-version: "17"
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
 
       - name: Maven Build
         shell: bash
@@ -67,3 +71,19 @@ jobs:
       - name: Update dependency graph
         if: github.event_name == 'push' && github.ref_name == 'main'
         uses: advanced-security/maven-dependency-submission-action@v5
+
+  javadoc:
+    name: Publish JavaDoc
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: write
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Deploy javadoc to Github Pages
+        uses: dev-vince/actions-publish-javadoc@4004c6ca5881690e83c49a28a0b16fcab089e860 # v1.0.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          java-distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
+          project: "maven"
