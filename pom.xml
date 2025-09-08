@@ -297,6 +297,40 @@
         </plugins>
       </build>
     </profile>
+    <!-- Shell App GraalVM Native Image Compilation Profile -->
+    <profile>
+      <id>shell-native</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.graalvm.buildtools</groupId>
+            <artifactId>native-maven-plugin</artifactId>
+            <version>0.11.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <mainClass>dev.digiried.wattpilot.shell.App</mainClass>
+              <imageName>wattpilotShell</imageName>
+              <buildArgs>
+                <!-- enables additional compiler optimizations -->
+                <buildArg>-O3</buildArg>
+              </buildArgs>
+            </configuration>
+            <executions>
+              <execution>
+                <id>build-native</id>
+                <goals>
+                  <goal>compile-no-fork</goal>
+                </goals>
+                <phase>package</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <!-- Local GPG Signing Profile -->
     <profile>
       <id>local-sign</id>

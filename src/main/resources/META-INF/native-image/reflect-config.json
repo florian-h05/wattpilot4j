@@ -1,0 +1,151 @@
+[
+  {
+    "name": "dev.digiried.wattpilot.dto.PartialStatus",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "dev.digiried.wattpilot.messages.AuthErrorMessage",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "dev.digiried.wattpilot.messages.AuthMessage",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "dev.digiried.wattpilot.messages.AuthRequiredMessage",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "dev.digiried.wattpilot.messages.AuthSuccessMessage",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "dev.digiried.wattpilot.messages.DeltaStatusMessage",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "dev.digiried.wattpilot.messages.FullStatusMessage",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "dev.digiried.wattpilot.messages.HelloMessage",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "dev.digiried.wattpilot.messages.IncomingMessage",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "dev.digiried.wattpilot.messages.Message",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "dev.digiried.wattpilot.messages.MessageType",
+    "allDeclaredFields": true,
+    "fields": [
+      {
+        "name": "AUTH_ERROR"
+      },
+      {
+        "name": "AUTH_REQUIRED"
+      },
+      {
+        "name": "AUTH_SUCCESS"
+      },
+      {
+        "name": "DELTA_STATUS"
+      },
+      {
+        "name": "FULL_STATUS"
+      },
+      {
+        "name": "HELLO"
+      },
+      {
+        "name": "RESPONSE"
+      }
+    ]
+  },
+  {
+    "name": "dev.digiried.wattpilot.messages.OutgoingMessage",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "dev.digiried.wattpilot.messages.ResponseMessage",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "dev.digiried.wattpilot.messages.SecuredMessage",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "dev.digiried.wattpilot.messages.SetValueMessage",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  }
+]
