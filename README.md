@@ -37,6 +37,8 @@ gpg --keyserver keys.openpgp.org --recv-keys F2CB9FE8FD59D83C0816FF0165DED02BE8F
 You only need to implement the [`WattpilotListener`](src/main/java/dev/digiried/wattpilot/WattpilotClientListener.java) interface to receive connection and disconnect events, as well as status updates,
 and create an instance of the [`WattpilotClient`](src/main/java/dev/digiried/wattpilot/WattpilotClient.java) class, add your listener and connect to the wallbox through the `connect` method.
 
+JavaDoc is published through GitHub Pages: <https://florian-h05.github.io/wattpilot4j/>
+
 As an example, have a look at the [main class of the Wattpilot shell](src/main/java/dev/digiried/wattpilot/shell/App.java)
 or the [openHAB Wattpilot Binding](https://github.com/openhab/openhab-addons/tree/main/bundles/org.openhab.binding.froniuswattpilot).
 
@@ -60,6 +62,22 @@ You can optionally configure logging by providing `org.slf4j.simpleLogger.log` s
 ```
 -Dorg.slf4j.simpleLogger.defaultLogLevel=info
 -Dorg.slf4j.simpleLogger.log.dev.digiried=debug
+```
+
+### Compile Shell to Native Executable
+
+You can compile the shell to a native executable with [GraalVM Native Image](https://www.graalvm.org/latest/reference-manual/native-image/).
+
+Compile the native executable with:
+
+```shell
+./mvnw -p shell-native clean package
+```
+
+Run the native executable with:
+
+```shell
+./target/wattpilotShell YOUR_WALLBOX_IP YOUR_WALLBOX_PASSWORD
 ```
 
 ## Disclaimer
