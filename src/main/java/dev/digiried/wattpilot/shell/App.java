@@ -102,7 +102,9 @@ public class App implements WattpilotClientListener {
                     System.err.println("Invalid command: " + line);
                 }
             } else {
-                System.err.println("Unknown command: " + line);
+                if (!line.isEmpty()) {
+                    System.err.println("Unknown command: " + line);
+                }
             }
         }
         try {
@@ -136,7 +138,7 @@ wattpilot4j Shell - Copyright (c) 2025 Florian Hotze under Apache License, Versi
 Commands:
   status                                    get the current status of the wallbox
   set current <current>                     set the charging current in A [6-32]
-  set force <state>                         set the enforced charging state (ON, OFF, NONE)
+  set force <state>                         set the enforced charging state (ON, OFF, NEUTRAL)
   set mode <mode>                           set the charging mode (DEFAULT, ECO, NEXT_TRIP)
   set boost <enabled>                       enable/disable charging boost in ECO or NEXT_TRIP mode (true, false)
   set boost_soc_limit                       set the battery SoC limit in % for charging boost [0-100]
