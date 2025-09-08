@@ -2,6 +2,11 @@ name: CI Build
 
 on:
   workflow_dispatch:
+    inputs:
+      ref:
+        description: "The branch, tag or SHA to checkout, e.g. refs/branches/main or refs/tags/vx.y.z"
+        required: false
+        type: string
   push:
     # Build snapshot:
     branches: ["main"]
@@ -18,6 +23,7 @@ on:
 env:
   JAVA_DISTRIBUTION: "temurin"
   JAVA_VERSION: 17
+  REF: ${{ inputs.ref || github.ref }}
 
 jobs:
   build:
@@ -29,6 +35,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          ref: ${{ env.REF }}
 
       - name: Set up Cache
         uses: actions/cache@v4
@@ -73,17 +81,31 @@ jobs:
         uses: advanced-security/maven-dependency-submission-action@v5
 
   javadoc:
-    name: Publish JavaDoc
+    name: Publish JavaDoc to GitHub Pages
     runs-on: "ubuntu-24.04"
     permissions:
       contents: write
-    if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
-      - name: Deploy javadoc to Github Pages
-        uses: dev-vince/actions-publish-javadoc@4004c6ca5881690e83c49a28a0b16fcab089e860 # v1.0.1
+      - name: Checkout repository
+        uses: actions/checkout@v5
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          java-distribution: ${{ env.JAVA_DISTRIBUTION }}
+          ref: ${{ env.REF }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
-          project: "maven"
+
+      - name: Build JavaDoc
+        shell: bash
+        run: "./mvnw -B --show-version --file pom.xml javadoc:aggregate"
+
+      - name: Publish to GitHub Pages
+        if: startsWith(env.REF, 'refs/tags/v')
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: target/reports/apidocs
+          force_orphan: true
