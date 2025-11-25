@@ -432,7 +432,7 @@ public class WattpilotClient {
         @Override
         public void onWebSocketError(Throwable error) {
             logger.debug("onWebSocketError", error);
-            onDisconnected("WebSocket error", error);
+            onDisconnected("Connection error", error);
         }
 
         @Override
