@@ -314,7 +314,8 @@ public class WattpilotClient {
                                 var session = this.session;
                                 if (session == null) {
                                     throw new IllegalStateException(
-                                            "No WebSocket session available");
+                                            "No WebSocket session available, this should not"
+                                                    + " happen");
                                 }
                                 session.getRemote().sendString(PING_MESSAGE);
                                 scheduleTimeoutTask();
@@ -372,7 +373,8 @@ public class WattpilotClient {
         logger.debug("Writing message {}", json);
         var session = this.session;
         if (session == null) {
-            throw new IllegalStateException("No WebSocket session available");
+            throw new IllegalStateException(
+                    "No WebSocket session available, this should not happen");
         }
         session.getRemote()
                 .sendString(
@@ -534,9 +536,13 @@ public class WattpilotClient {
             connectedFuture.complete(null);
             this.connectedFuture = null;
         }
+        var wattpilotInfo = this.wattpilotInfo;
+        if (wattpilotInfo == null) {
+            throw new IllegalStateException("wattpilotInfo is null, this should not happen");
+        }
         synchronized (listeners) {
             for (WattpilotClientListener listener : listeners) {
-                listener.connected();
+                listener.connected(wattpilotInfo);
             }
         }
     }

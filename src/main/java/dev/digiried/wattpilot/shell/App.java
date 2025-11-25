@@ -117,7 +117,7 @@ public class App implements WattpilotClientListener {
     }
 
     @Override
-    public void connected() {
+    public void connected(WattpilotInfo info) {
         System.out.println("Wallbox connected");
     }
 

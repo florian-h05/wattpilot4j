@@ -29,8 +29,22 @@ import org.eclipse.jdt.annotation.Nullable;
  */
 @NonNullByDefault
 public interface WattpilotClientListener {
-    /** Called when the client successfully connected to the wallbox. */
-    void connected();
+    /**
+     * Called when the client successfully connected to the wallbox.
+     *
+     * @deprecated Use {@link #connected(WattpilotInfo)} instead.
+     */
+    @Deprecated(forRemoval = true)
+    default void connected() {}
+
+    /**
+     * Called when the client successfully connected to the wallbox and received the initial device
+     *
+     * @param info the device info
+     */
+    default void connected(WattpilotInfo info) {
+        connected();
+    }
 
     /**
      * Called when the client disconnected from the wallbox.
