@@ -112,6 +112,7 @@ public class App implements WattpilotClientListener {
         } catch (TimeoutException | InterruptedException | ExecutionException e) {
             // no handling needed here
         }
+        client.removeListener(this);
         scanner.close();
         System.exit(0);
     }
