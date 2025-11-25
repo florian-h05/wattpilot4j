@@ -33,7 +33,7 @@
   </scm>
 
   <properties>
-    <enforcer-plugin.version>3.5.0</enforcer-plugin.version>
+    <enforcer-plugin.version>3.6.2</enforcer-plugin.version>
     <spotless.version>3.1.0</spotless.version>
     <license-plugin.version>2.5.0</license-plugin.version>
     <java.version>17</java.version>
