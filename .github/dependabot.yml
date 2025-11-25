@@ -6,6 +6,7 @@
 version: 2
 
 updates:
+  # GitHub Actions:
   - package-ecosystem: "github-actions" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
@@ -14,3 +15,18 @@ updates:
     labels:
       - dependencies
       - infrastructure
+  # Maven plugins:
+  - package-ecosystem: "maven" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+      - infrastructure
+    registries: "*"
+    allow:
+      - dependency-name: "org.apache.maven.plugins:*"
+      - dependency-name: "com.diffplug.spotless:spotless-maven-plugin"
+      - dependency-name: "org.codehaus.mojo:*"
+      - dependency-name: "org.sonatype.central:central-publishing-maven-plugin"
