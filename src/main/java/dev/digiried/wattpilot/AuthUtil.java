@@ -20,7 +20,6 @@
 package dev.digiried.wattpilot;
 
 import dev.digiried.wattpilot.messages.AuthMessage;
-import dev.digiried.wattpilot.messages.AuthRequiredMessage;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -36,12 +35,15 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Utility class implementing the authentication mechanism both for establishing the connection and
  * authenticating messages.
  *
  * @author Florian Hotze - Initial contribution
  */
+@NonNullByDefault
 final class AuthUtil {
     private AuthUtil() {}
 
@@ -76,8 +78,10 @@ final class AuthUtil {
      * Creates an AuthMessage from the hashed password and the tokens provided by the wallbox.
      *
      * @param hashedPassword the hashed password, see {@link #hashPassword(String, String)}
-     * @param token1 the first token provided by the wallbox, see {@link AuthRequiredMessage}
-     * @param token2 the second token provided by the wallbox, see {@link AuthRequiredMessage}
+     * @param token1 the first token provided by the wallbox, see {@link
+     *     dev.digiried.wattpilot.messages.AuthRequiredMessage}
+     * @param token2 the second token provided by the wallbox, see {@link
+     *     dev.digiried.wattpilot.messages.AuthRequiredMessage}
      * @return the AuthMessage to send to the wallbox
      * @throws NoSuchAlgorithmException if SHA-256 hash algorithm is not available
      */

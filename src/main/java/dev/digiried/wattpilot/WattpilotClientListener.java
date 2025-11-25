@@ -19,11 +19,15 @@
  */
 package dev.digiried.wattpilot;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+
 /**
  * Interface for listening to events from the {@link WattpilotClient}.
  *
  * @author Florian Hotze - Initial contribution
  */
+@NonNullByDefault
 public interface WattpilotClientListener {
     /** Called when the client successfully connected to the wallbox. */
     void connected();
@@ -35,7 +39,7 @@ public interface WattpilotClientListener {
      * @param cause the throwable that caused the disconnect or <code>null</code> if no throwable
      *     disconnected the client
      */
-    void disconnected(String reason, Throwable cause);
+    void disconnected(String reason, @Nullable Throwable cause);
 
     /**
      * Called when the client receives a status change from the wallbox.
