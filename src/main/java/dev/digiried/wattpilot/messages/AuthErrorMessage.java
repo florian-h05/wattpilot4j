@@ -30,7 +30,7 @@ public class AuthErrorMessage extends IncomingMessage {
     public String hash;
     public String message;
 
-    AuthErrorMessage(MessageType type) {
+    AuthErrorMessage() {
         super(MessageType.AUTH_ERROR);
     }
 }

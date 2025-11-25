@@ -36,12 +36,15 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Utility class implementing the authentication mechanism both for establishing the connection and
  * authenticating messages.
  *
  * @author Florian Hotze - Initial contribution
  */
+@NonNullByDefault
 final class AuthUtil {
     private AuthUtil() {}
 

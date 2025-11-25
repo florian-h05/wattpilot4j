@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class MessageDeserializer implements JsonDeserializer<Message> {
     private final Logger logger = LoggerFactory.getLogger(MessageDeserializer.class);
 
-    private static HashMap<String, Class<?>> messageHandlers = new HashMap<>();
+    private static final HashMap<String, Class<?>> messageHandlers = new HashMap<>();
 
     static {
         messageHandlers.put(MessageType.HELLO.getSerializedName(), HelloMessage.class);

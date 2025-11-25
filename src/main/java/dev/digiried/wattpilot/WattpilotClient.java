@@ -57,6 +57,9 @@ import java.util.concurrent.TimeoutException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
@@ -71,6 +74,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Florian Hotze - Initial contribution
  */
+@NonNullByDefault
 public class WattpilotClient {
     private static final String PING_MESSAGE = "{\"type\":\"PING\"}";
     private static final String PONG_RESPONSE_MESSAGE = "unknown message type=\"PING\"";
@@ -89,19 +93,19 @@ public class WattpilotClient {
     private final Map<String, CompletableFuture<CommandResponse>> responseFutures =
             new ConcurrentHashMap<>();
 
-    private CompletableFuture<Void> connectedFuture = null;
-    private CompletableFuture<Void> disconnectFuture = null;
+    private @Nullable CompletableFuture<@Nullable Void> connectedFuture = null;
+    private @Nullable CompletableFuture<@Nullable Void> disconnectFuture = null;
 
     private final long pingInterval;
     private final long pingTimeout;
-    private ScheduledFuture<?> pingTask;
-    private ScheduledFuture<?> timeoutTask;
+    private @Nullable ScheduledFuture<?> pingTask;
+    private @Nullable ScheduledFuture<?> timeoutTask;
 
-    private Session session;
+    private @Nullable Session session;
     private boolean isAuthenticated = false;
     private boolean isInitialized = false;
-    private byte[] hashedPassword;
-    private WattpilotInfo wattpilotInfo;
+    private byte[] hashedPassword = new byte[0];
+    private @Nullable WattpilotInfo wattpilotInfo;
     private int requestCounter = 0;
 
     /**
@@ -121,7 +125,7 @@ public class WattpilotClient {
      *
      * @param httpClient the HTTP client to use, allows configuring HTTP settings
      * @param pingInterval the ping interval
-     * @param pingTimeout the ping timeout, must be less than <code>pingInterval</code>
+     * @param pingTimeout the ping timeout; must be less than <code>pingInterval</code>
      */
     public WattpilotClient(HttpClient httpClient, int pingInterval, int pingTimeout) {
         this.client = new WebSocketClient(httpClient);
@@ -167,7 +171,9 @@ public class WattpilotClient {
      * @return future that completes once the client has successfully connected
      * @throws IOException if the synchronous preparations for the connection establishment fail
      */
-    public CompletableFuture<Void> connect(String host, String password) throws IOException {
+    public CompletableFuture<@Nullable Void> connect(String host, String password)
+            throws IOException {
+        var session = this.session;
         if (session != null && session.isOpen()) {
             throw new IOException("Can not connect on already connected session");
         }
@@ -183,13 +189,13 @@ public class WattpilotClient {
      *
      * @return future that completes once the client has successfully disconnected
      */
-    public CompletableFuture<Void> disconnect() {
+    public CompletableFuture<@Nullable Void> disconnect() {
+        var session = this.session;
         if (session != null && session.isOpen()) {
             logger.debug("Disconnecting from wallbox at {}", session.getRemoteAddress());
             session.close();
             // onDisconnected will be called by the WebsocketListener and perform the clean-up
-            disconnectFuture = new CompletableFuture<>();
-            return disconnectFuture;
+            return this.disconnectFuture = new CompletableFuture<>();
         }
         return CompletableFuture.completedFuture(null);
     }
@@ -200,6 +206,7 @@ public class WattpilotClient {
      * @return true if connected
      */
     public boolean isConnected() {
+        var session = this.session;
         return session != null && session.isOpen() && isAuthenticated;
     }
 
@@ -208,7 +215,7 @@ public class WattpilotClient {
      *
      * @return the device info or <code>null</code> if not available yet
      */
-    public WattpilotInfo getDeviceInfo() {
+    public @Nullable WattpilotInfo getDeviceInfo() {
         return wattpilotInfo;
     }
 
@@ -217,7 +224,7 @@ public class WattpilotClient {
      *
      * @return the current status or <code>null</code> if not available yet
      */
-    public WattpilotStatus getStatus() {
+    public @Nullable WattpilotStatus getStatus() {
         if (!isInitialized) {
             return null;
         }
@@ -238,13 +245,14 @@ public class WattpilotClient {
         }
 
         SetValueMessage setValueMessage = SetValueMessage.fromCommand(requestCounter, command);
+        var wattpilotInfo = this.wattpilotInfo;
         if (wattpilotInfo != null && !wattpilotInfo.secured()) {
             logger.trace("Sending SetValueMessage");
             return sendOutgoingMessage(String.valueOf(setValueMessage.requestId), setValueMessage);
         }
 
         String data = gson.toJson(setValueMessage);
-        String hmac = null;
+        String hmac;
         try {
             hmac = AuthUtil.createHmac(hashedPassword, data);
         } catch (NoSuchAlgorithmException e) {
@@ -266,7 +274,7 @@ public class WattpilotClient {
      * @param password the password to authenticate with
      * @throws IOException if the connection fails
      */
-    private CompletableFuture<Void> connectWebsocket(String host, String password)
+    private CompletableFuture<@Nullable Void> connectWebsocket(String host, String password)
             throws IOException {
         URI uri;
         try {
@@ -282,15 +290,17 @@ public class WattpilotClient {
             throw new IOException("Failed to start WebSocket client", e);
         }
 
-        connectedFuture = new CompletableFuture<>();
+        CompletableFuture<@Nullable Void> connectedFuture =
+                this.connectedFuture = new CompletableFuture<>();
         client.connect(new FroniusWebsocketListener(password), uri);
         return connectedFuture;
     }
 
     private void cancelPingTask() {
+        var pingTask = this.pingTask;
         if (pingTask != null) {
             pingTask.cancel(false);
-            pingTask = null;
+            this.pingTask = null;
         }
         cancelTimeoutTask();
     }
@@ -302,6 +312,11 @@ public class WattpilotClient {
                         () -> {
                             try {
                                 logger.debug("Sending PING message");
+                                var session = this.session;
+                                if (session == null) {
+                                    throw new IllegalStateException(
+                                            "No WebSocket session available");
+                                }
                                 session.getRemote().sendString(PING_MESSAGE);
                                 scheduleTimeoutTask();
                             } catch (IOException e) {
@@ -315,12 +330,14 @@ public class WattpilotClient {
     }
 
     private void cancelTimeoutTask() {
+        var timeoutTask = this.timeoutTask;
         if (timeoutTask != null) {
             timeoutTask.cancel(false);
-            timeoutTask = null;
+            this.timeoutTask = null;
         }
     }
 
+    @SuppressWarnings("null")
     private void scheduleTimeoutTask() {
         cancelTimeoutTask();
         timeoutTask =
@@ -354,6 +371,10 @@ public class WattpilotClient {
         String json = gson.toJson(message);
 
         logger.debug("Writing message {}", json);
+        var session = this.session;
+        if (session == null) {
+            throw new IllegalStateException("No WebSocket session available");
+        }
         session.getRemote()
                 .sendString(
                         json,
@@ -364,6 +385,7 @@ public class WattpilotClient {
                                 responseFutures.put(messageId, future);
                             }
 
+                            @NonNullByDefault({})
                             @Override
                             public void writeFailed(Throwable t) {
                                 future.completeExceptionally(t);
@@ -373,6 +395,7 @@ public class WattpilotClient {
     }
 
     /** Handles incoming WebSocket messages from the wallbox. */
+    @NonNullByDefault({})
     @WebSocket
     private class FroniusWebsocketListener implements WebSocketListener {
         private final String password;
@@ -396,7 +419,7 @@ public class WattpilotClient {
         @Override
         public void onWebSocketError(Throwable error) {
             logger.debug("onWebSocketError", error);
-            onDisconnected(error.getMessage(), error);
+            onDisconnected("WebSocket error", error);
         }
 
         @Override
@@ -404,6 +427,7 @@ public class WattpilotClient {
             logger.trace("onWebSocketBinary {} {} {}", data, offset, len);
         }
 
+        @SuppressWarnings("null")
         @Override
         public void onWebSocketText(String message) {
             logger.trace("onWebSocketText {}", message);
@@ -467,7 +491,9 @@ public class WattpilotClient {
             if (m instanceof AuthErrorMessage rm) {
                 logger.trace("Received AuthErrorMessage");
                 logger.error("Authentication failed: {}", rm.message);
-                onDisconnected(rm.message, null);
+                onDisconnected(
+                        "Authentication failed",
+                        new IOException("Authentication failed: " + rm.message));
             }
 
             if (m instanceof FullStatusMessage fsm) {
@@ -493,7 +519,8 @@ public class WattpilotClient {
                     return;
                 }
 
-                CompletableFuture<CommandResponse> future = responseFutures.remove(rm.requestId);
+                CompletableFuture<@NonNull CommandResponse> future =
+                        responseFutures.remove(rm.requestId);
                 if (future != null) {
                     future.complete(new CommandResponse(rm.success, rm.status));
                 }
@@ -503,31 +530,32 @@ public class WattpilotClient {
 
     private void onConnected() { // NOSONAR: we want to keep this method here
         schedulePingTask();
+        var connectedFuture = this.connectedFuture;
         if (connectedFuture != null && !connectedFuture.isDone()) {
             connectedFuture.complete(null);
-            connectedFuture = null;
+            this.connectedFuture = null;
         }
         synchronized (listeners) {
             for (WattpilotClientListener listener : listeners) {
-                if (listener != null) {
-                    listener.connected();
-                }
+                listener.connected();
             }
         }
     }
 
     private void onDisconnected(
-            String reason, Throwable cause) { // NOSONAR: we want to keep this method here
+            String reason, @Nullable Throwable cause) { // NOSONAR: we want to keep this method here
         isAuthenticated = false;
         cancelPingTask();
+        var session = this.session;
         if (session != null && session.isOpen()) {
             session.close();
         }
-        session = null; // make sure to always destroy the session, even if already closed
+        this.session = null; // make sure to always destroy the session, even if already closed
         // complete connection future exceptionally
+        var connectedFuture = this.connectedFuture;
         if (connectedFuture != null && !connectedFuture.isDone()) {
             connectedFuture.completeExceptionally(cause != null ? cause : new IOException(reason));
-            connectedFuture = null;
+            this.connectedFuture = null;
         }
         // complete all pending futures exceptionally
         responseFutures.forEach(
@@ -538,18 +566,17 @@ public class WattpilotClient {
         // notify listeners
         synchronized (listeners) {
             for (WattpilotClientListener listener : listeners) {
-                if (listener != null) {
-                    listener.disconnected(reason, cause);
-                }
+                listener.disconnected(reason, cause);
             }
         }
+        var disconnectFuture = this.disconnectFuture;
         if (disconnectFuture != null && !disconnectFuture.isDone()) {
             if (cause != null) {
                 disconnectFuture.completeExceptionally(cause);
             } else {
                 disconnectFuture.complete(null);
             }
-            disconnectFuture = null;
+            this.disconnectFuture = null;
         }
     }
 
@@ -621,9 +648,7 @@ public class WattpilotClient {
     private void notifyListenersAboutStatusChange() {
         synchronized (listeners) {
             for (WattpilotClientListener listener : listeners) {
-                if (listener != null) {
-                    listener.statusChanged(wattpilotStatus);
-                }
+                listener.statusChanged(wattpilotStatus);
             }
         }
     }
