@@ -35,7 +35,7 @@
   <properties>
     <enforcer-plugin.version>3.6.2</enforcer-plugin.version>
     <spotless.version>3.1.0</spotless.version>
-    <license-plugin.version>2.5.0</license-plugin.version>
+    <license-plugin.version>2.7.0</license-plugin.version>
     <java.version>17</java.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
