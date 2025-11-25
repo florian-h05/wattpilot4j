@@ -419,7 +419,7 @@ public class WattpilotClient {
                     new IOException(
                             "Connection was closed unexpectedly: code "
                                     + code
-                                    + "; reason"
+                                    + "; reason: "
                                     + reason));
         }
 
