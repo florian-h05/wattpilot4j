@@ -408,7 +408,19 @@ public class WattpilotClient {
         @Override
         public void onWebSocketClose(int code, String reason) {
             logger.trace("onWebSocketClose {} {}", code, reason);
-            onDisconnected("Connection was closed gracefully", null);
+            // see https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code for CloseEvent
+            // codes
+            if (code == 1000 || code == 1005) {
+                onDisconnected("Connection was closed gracefully", null);
+                return;
+            }
+            onDisconnected(
+                    "Connection was closed unexpectedly",
+                    new IOException(
+                            "Connection was closed unexpectedly: code "
+                                    + code
+                                    + "; reason"
+                                    + reason));
         }
 
         @Override
