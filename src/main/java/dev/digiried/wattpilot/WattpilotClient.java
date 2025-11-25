@@ -195,9 +195,7 @@ public class WattpilotClient {
             logger.debug("Disconnecting from wallbox at {}", session.getRemoteAddress());
             session.close();
             // onDisconnected will be called by the WebsocketListener and perform the clean-up
-            CompletableFuture<@Nullable Void> disconnectFuture =
-                    this.disconnectFuture = new CompletableFuture<>();
-            return disconnectFuture;
+            return this.disconnectFuture = new CompletableFuture<>();
         }
         return CompletableFuture.completedFuture(null);
     }
