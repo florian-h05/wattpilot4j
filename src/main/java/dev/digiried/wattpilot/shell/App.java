@@ -48,7 +48,7 @@ import org.eclipse.jetty.client.HttpClient;
  *
  * @author Florian Hotze - Initial contribution
  */
-@SuppressWarnings({"squid:S106", "squid:S2142", "CallToPrintStackTrace"})
+@SuppressWarnings({"squid:S106", "squid:S2142", "CallToPrintStackTrace", "null"})
 public class App implements WattpilotClientListener {
     private WattpilotClient client;
 
@@ -123,11 +123,7 @@ public class App implements WattpilotClientListener {
 
     @Override
     public void disconnected(String reason, Throwable cause) {
-        if (reason != null) {
-            System.out.println("Wallbox disconnected: " + reason);
-        } else {
-            System.out.println("Wallbox disconnected");
-        }
+        System.out.println("Wallbox disconnected: " + reason);
     }
 
     private static void printHelp() {
