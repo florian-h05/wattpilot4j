@@ -52,7 +52,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -346,7 +345,7 @@ public class WattpilotClient {
                             logger.warn("Ping to {} timed out", session.getRemoteAddress());
                             onDisconnected(
                                     "Ping timed out",
-                                    new TimeoutException("No pong received before ping timed out"));
+                                    new IOException("No pong received before ping timed out"));
                         },
                         pingTimeout,
                         TimeUnit.SECONDS);
@@ -407,7 +406,7 @@ public class WattpilotClient {
         @Override
         public void onWebSocketClose(int code, String reason) {
             logger.trace("onWebSocketClose {} {}", code, reason);
-            onDisconnected(reason, null);
+            onDisconnected("Connection was closed gracefully", null);
         }
 
         @Override
