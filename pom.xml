@@ -116,7 +116,7 @@
             <arg>-classpath</arg>
             <arg>${project.build.directory}/dependency</arg>
             <arg>-err:+nullAnnot(org.eclipse.jdt.annotation.Nullable|org.eclipse.jdt.annotation.NonNull|org.eclipse.jdt.annotation.NonNullByDefault),+inheritNullAnnot,+nullAnnotConflict,-nullUncheckedConversion</arg>
-            <arg>-warn:+null,+inheritNullAnnot,+nullAnnotConflict,-nullUncheckedConversion,+nullAnnotRedundant,+nullDereference</arg>
+            <arg>-warn:+null,+inheritNullAnnot,+nullAnnotConflict,-nullUncheckedConversion,+nullAnnotRedundant,+nullDereference,-unused</arg>
           </compilerArgs>
           <showWarnings>true</showWarnings>
           <showDeprecation>true</showDeprecation>
