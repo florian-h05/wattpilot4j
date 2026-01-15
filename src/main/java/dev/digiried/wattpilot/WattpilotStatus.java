@@ -48,6 +48,27 @@ public class WattpilotStatus {
     protected WattpilotStatus() {}
 
     /**
+     * Create a new Wattpilot status by copying another status.
+     *
+     * @param other the status to copy
+     */
+    public WattpilotStatus(WattpilotStatus other) {
+        this.boostEnabled = other.boostEnabled;
+        this.boostSoCLimit = other.boostSoCLimit;
+        this.chargingAllowed = other.chargingAllowed;
+        this.chargingCurrent = other.chargingCurrent;
+        this.chargingState = other.chargingState;
+        this.enforcedState = other.enforcedState;
+        this.chargingSinglePhase = other.chargingSinglePhase;
+        this.surplusPowerThreshold = other.surplusPowerThreshold;
+        this.surplusSoCThreshold = other.surplusSoCThreshold;
+        this.chargingMode = other.chargingMode;
+        this.chargingMetrics = other.chargingMetrics;
+        this.energyCounterSinceStart = other.energyCounterSinceStart;
+        this.energyCounterTotal = other.energyCounterTotal;
+    }
+
+    /**
      * Whether charging boost is enabled, i.e. provide additional power from battery or grid in
      * {@link ChargingMode#ECO} and {@link ChargingMode#NEXT_TRIP}.
      *

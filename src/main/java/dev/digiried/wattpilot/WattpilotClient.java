@@ -43,11 +43,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -86,7 +86,7 @@ public class WattpilotClient {
                     .create();
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    private final Set<WattpilotClientListener> listeners = new HashSet<>();
+    private final Set<WattpilotClientListener> listeners = new CopyOnWriteArraySet<>();
     private final WebSocketClient client;
     private final WattpilotStatus wattpilotStatus = new WattpilotStatus();
     private final Map<String, CompletableFuture<CommandResponse>> responseFutures =
@@ -141,9 +141,7 @@ public class WattpilotClient {
      * @param listener the listener to add
      */
     public void addListener(WattpilotClientListener listener) {
-        synchronized (listeners) {
-            listeners.add(listener);
-        }
+        listeners.add(listener);
     }
 
     /**
@@ -152,9 +150,7 @@ public class WattpilotClient {
      * @param listener the listener to remove
      */
     public void removeListener(WattpilotClientListener listener) {
-        synchronized (listeners) {
-            listeners.remove(listener);
-        }
+        listeners.remove(listener);
     }
 
     /**
@@ -227,7 +223,9 @@ public class WattpilotClient {
         if (!isInitialized) {
             return null;
         }
-        return wattpilotStatus;
+        synchronized (wattpilotStatus) {
+            return new WattpilotStatus(wattpilotStatus);
+        }
     }
 
     /**
@@ -376,6 +374,7 @@ public class WattpilotClient {
             throw new IllegalStateException(
                     "No WebSocket session available, this should not happen");
         }
+        responseFutures.put(messageId, future);
         session.getRemote()
                 .sendString(
                         json,
@@ -383,12 +382,12 @@ public class WattpilotClient {
                             @Override
                             public void writeSuccess() {
                                 logger.trace("writeSuccess for messageId {}", messageId);
-                                responseFutures.put(messageId, future);
                             }
 
                             @NonNullByDefault({})
                             @Override
                             public void writeFailed(Throwable t) {
+                                responseFutures.remove(messageId);
                                 future.completeExceptionally(t);
                             }
                         });
@@ -552,10 +551,8 @@ public class WattpilotClient {
         if (wattpilotInfo == null) {
             throw new IllegalStateException("wattpilotInfo is null, this should not happen");
         }
-        synchronized (listeners) {
-            for (WattpilotClientListener listener : listeners) {
-                listener.connected(wattpilotInfo);
-            }
+        for (WattpilotClientListener listener : listeners) {
+            listener.connected(wattpilotInfo);
         }
     }
 
@@ -581,10 +578,8 @@ public class WattpilotClient {
                     responseFutures.remove(key);
                 });
         // notify listeners
-        synchronized (listeners) {
-            for (WattpilotClientListener listener : listeners) {
-                listener.disconnected(reason, cause);
-            }
+        for (WattpilotClientListener listener : listeners) {
+            listener.disconnected(reason, cause);
         }
         var disconnectFuture = this.disconnectFuture;
         if (disconnectFuture != null && !disconnectFuture.isDone()) {
@@ -663,10 +658,12 @@ public class WattpilotClient {
     }
 
     private void notifyListenersAboutStatusChange() {
-        synchronized (listeners) {
-            for (WattpilotClientListener listener : listeners) {
-                listener.statusChanged(wattpilotStatus);
-            }
+        WattpilotStatus statusCopy;
+        synchronized (wattpilotStatus) {
+            statusCopy = new WattpilotStatus(wattpilotStatus);
+        }
+        for (WattpilotClientListener listener : listeners) {
+            listener.statusChanged(statusCopy);
         }
     }
 }
