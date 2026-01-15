@@ -41,6 +41,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.client.HttpClient;
 
 /**
@@ -49,8 +51,9 @@ import org.eclipse.jetty.client.HttpClient;
  * @author Florian Hotze - Initial contribution
  */
 @SuppressWarnings({"squid:S106", "squid:S2142", "CallToPrintStackTrace", "null"})
+@NonNullByDefault
 public class App implements WattpilotClientListener {
-    private WattpilotClient client;
+    private @NonNullByDefault({}) WattpilotClient client;
 
     /**
      * Main method to start the shell application.
@@ -123,7 +126,7 @@ public class App implements WattpilotClientListener {
     }
 
     @Override
-    public void disconnected(String reason, Throwable cause) {
+    public void disconnected(String reason, @Nullable Throwable cause) {
         System.out.println("Wallbox disconnected: " + reason);
     }
 
@@ -145,7 +148,8 @@ Commands:
 """);
     }
 
-    private static void printStatus(WattpilotInfo info, WattpilotStatus status) {
+    private static void printStatus(
+            @Nullable WattpilotInfo info, @Nullable WattpilotStatus status) {
         if (info == null || status == null) {
             System.err.println("Failed to get status");
             return;
@@ -197,7 +201,7 @@ Commands:
                     };
             if (command != null) {
                 CommandResponse res = client.sendCommand(command).get(5, TimeUnit.SECONDS);
-                if (res != null && res.success()) {
+                if (res.success()) {
                     System.out.println("Command successful");
                 } else {
                     System.err.println("Command failed");

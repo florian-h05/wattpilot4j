@@ -22,11 +22,14 @@ package dev.digiried.wattpilot.commands;
 import dev.digiried.wattpilot.dto.ChargingMode;
 import dev.digiried.wattpilot.dto.PropertyKeys;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Command to set the charging mode of the wallbox.
  *
  * @author Florian Hotze - Initial contribution
  */
+@NonNullByDefault
 public class SetChargingModeCommand extends Command {
     private final CommandValue<ChargingMode> value;
 

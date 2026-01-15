@@ -21,11 +21,14 @@ package dev.digiried.wattpilot.commands;
 
 import dev.digiried.wattpilot.dto.PropertyKeys;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Base class for all commands that can be sent to the wallbox.
  *
  * @author Florian Hotze - Initial contribution
  */
+@NonNullByDefault
 public abstract class Command {
     private final String key;
 

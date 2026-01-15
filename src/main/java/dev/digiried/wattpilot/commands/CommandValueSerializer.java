@@ -28,12 +28,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
  * JSON serializer for {@link CommandValue}.
  *
  * @author Florian Hotze - Initial contribution
  */
+@NonNullByDefault
 public class CommandValueSerializer implements JsonSerializer<CommandValue<?>> {
     @Override
     public JsonElement serialize(

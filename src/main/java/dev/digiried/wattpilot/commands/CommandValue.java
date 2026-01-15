@@ -19,6 +19,8 @@
  */
 package dev.digiried.wattpilot.commands;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Wrapper for command values. Allows to register a {@link com.google.gson.TypeAdapter} for
  * serializing the actual value.
@@ -26,4 +28,5 @@ package dev.digiried.wattpilot.commands;
  * @param <T> the type of the value
  * @param value the value
  */
+@NonNullByDefault
 public record CommandValue<T>(T value) {}

@@ -21,6 +21,8 @@ package dev.digiried.wattpilot.commands;
 
 import dev.digiried.wattpilot.dto.PropertyKeys;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Command to enable or disable the charging boost in {@link
  * dev.digiried.wattpilot.dto.ChargingMode#ECO} or {@link
@@ -28,6 +30,7 @@ import dev.digiried.wattpilot.dto.PropertyKeys;
  *
  * @author Florian Hotze - Initial contribution
  */
+@NonNullByDefault
 public class SetBoostCommand extends Command {
     private final CommandValue<Boolean> value;
 

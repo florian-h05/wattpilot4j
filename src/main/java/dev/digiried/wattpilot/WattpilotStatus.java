@@ -24,25 +24,28 @@ import dev.digiried.wattpilot.dto.ChargingMode;
 import dev.digiried.wattpilot.dto.ChargingState;
 import dev.digiried.wattpilot.dto.EnforcedChargingState;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Class providing the current configuration and status of the Wattpilot.
  *
  * @author Florian Hotze - Initial contribution
  */
+@NonNullByDefault
 public class WattpilotStatus {
     private boolean boostEnabled;
     private int boostSoCLimit;
     private boolean chargingAllowed;
     private int chargingCurrent;
-    private ChargingState chargingState;
-    private EnforcedChargingState enforcedState;
+    private @NonNullByDefault({}) ChargingState chargingState;
+    private @NonNullByDefault({}) EnforcedChargingState enforcedState;
     private boolean chargingSinglePhase;
     private float surplusPowerThreshold;
     private int surplusSoCThreshold;
-    private ChargingMode chargingMode;
-    private ChargingMetrics chargingMetrics;
-    private Double energyCounterSinceStart;
-    private Integer energyCounterTotal;
+    private @NonNullByDefault({}) ChargingMode chargingMode;
+    private @NonNullByDefault({}) ChargingMetrics chargingMetrics;
+    private @NonNullByDefault({}) Double energyCounterSinceStart;
+    private @NonNullByDefault({}) Integer energyCounterTotal;
 
     /** Create a new Wattpilot status. */
     protected WattpilotStatus() {}

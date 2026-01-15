@@ -22,12 +22,15 @@ package dev.digiried.wattpilot.commands;
 import dev.digiried.wattpilot.dto.ChargingMode;
 import dev.digiried.wattpilot.dto.PropertyKeys;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Command to set the PV surplus power threshold of the wallbox for {@link ChargingMode#ECO} and
  * {@link ChargingMode#NEXT_TRIP}.
  *
  * @author Florian Hotze - Initial contribution
  */
+@NonNullByDefault
 public class SetSurplusPowerThresholdCommand extends Command {
     private final CommandValue<Float> value;
 

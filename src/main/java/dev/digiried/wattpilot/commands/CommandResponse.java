@@ -21,6 +21,8 @@ package dev.digiried.wattpilot.commands;
 
 import dev.digiried.wattpilot.dto.PartialStatus;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Record for the response of a {@link Command}.
  *
@@ -29,4 +31,5 @@ import dev.digiried.wattpilot.dto.PartialStatus;
  *     parameters.
  * @author Florian Hotze - Initial contribution
  */
+@NonNullByDefault
 public record CommandResponse(boolean success, PartialStatus status) {}

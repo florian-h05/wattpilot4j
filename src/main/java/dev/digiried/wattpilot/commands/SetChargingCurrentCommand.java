@@ -21,11 +21,14 @@ package dev.digiried.wattpilot.commands;
 
 import dev.digiried.wattpilot.dto.PropertyKeys;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Command to set the charging current of the wallbox.
  *
  * @author Florian Hotze - Initial contribution
  */
+@NonNullByDefault
 public class SetChargingCurrentCommand extends Command {
     private final CommandValue<Integer> value;
 

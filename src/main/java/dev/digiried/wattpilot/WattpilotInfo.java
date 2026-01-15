@@ -19,6 +19,8 @@
  */
 package dev.digiried.wattpilot;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 /**
  * Record for Wattpilot information received on connection establishment.
  *
@@ -30,6 +32,7 @@ package dev.digiried.wattpilot;
  * @param secured whether the connection has to be authenticated
  * @author Florian Hotze - Initial contribution
  */
+@NonNullByDefault
 public record WattpilotInfo(
         String serial,
         String hostname,
