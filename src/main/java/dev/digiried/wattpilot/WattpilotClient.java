@@ -372,6 +372,7 @@ public class WattpilotClient {
             throw new IllegalStateException(
                     "No WebSocket session available, this should not happen");
         }
+        responseFutures.put(messageId, future);
         session.getRemote()
                 .sendString(
                         json,
@@ -379,12 +380,12 @@ public class WattpilotClient {
                             @Override
                             public void writeSuccess() {
                                 logger.trace("writeSuccess for messageId {}", messageId);
-                                responseFutures.put(messageId, future);
                             }
 
                             @NonNullByDefault({})
                             @Override
                             public void writeFailed(Throwable t) {
+                                responseFutures.remove(messageId);
                                 future.completeExceptionally(t);
                             }
                         });
