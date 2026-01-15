@@ -223,7 +223,9 @@ public class WattpilotClient {
         if (!isInitialized) {
             return null;
         }
-        return wattpilotStatus;
+        synchronized (wattpilotStatus) {
+            return new WattpilotStatus(wattpilotStatus);
+        }
     }
 
     /**
@@ -656,8 +658,12 @@ public class WattpilotClient {
     }
 
     private void notifyListenersAboutStatusChange() {
+        WattpilotStatus statusCopy;
+        synchronized (wattpilotStatus) {
+            statusCopy = new WattpilotStatus(wattpilotStatus);
+        }
         for (WattpilotClientListener listener : listeners) {
-            listener.statusChanged(wattpilotStatus);
+            listener.statusChanged(statusCopy);
         }
     }
 }
