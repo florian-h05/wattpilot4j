@@ -37,6 +37,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * Utility class implementing the authentication mechanism both for establishing the connection and
@@ -48,16 +49,113 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 final class AuthUtil {
     private AuthUtil() {}
 
+    enum HashAlgorithm {
+        BCRYPT("bcrypt"),
+        PBKDF2("pbkdf2");
+
+        private final String identifier;
+
+        HashAlgorithm(String identifier) {
+            this.identifier = identifier;
+        }
+
+        public String getIdentifier() {
+            return identifier;
+        }
+
+        public static @Nullable HashAlgorithm fromString(String name) {
+            for (HashAlgorithm algorithm : values()) {
+                if (algorithm.getIdentifier().equals(name)) {
+                    return algorithm;
+                }
+            }
+            return null;
+        }
+    }
+
     /**
-     * Hashes the password using PBKDF2 with HMAC-SHA512, encodes it with Bas64 and truncates to 32
-     * bytes.
+     * Hashes the password using the specified algorithm with a custom salt derived from the serial
+     *
+     * @param serial the serial number of the device (expects digits only)
+     * @param password the password to hash
+     * @param algorithm the hash algorithm to use
+     * @return the hashed password
+     * @throws NoSuchAlgorithmException if a required hash or key algorithm is not available
+     */
+    static byte[] hashPassword(String serial, String password, HashAlgorithm algorithm)
+            throws NoSuchAlgorithmException {
+        return switch (algorithm) {
+            case BCRYPT -> hashPasswordWithBCrypt(serial, password);
+            case PBKDF2 -> hashPasswordWithPKDF2(serial, password);
+        };
+    }
+
+    /**
+     * Hashes the password using BCrypt with a custom salt derived from the serial number.
+     *
+     * <p>Logic matches the Python wattpilot reference: 1. SHA-256 hash the password (result as hex
+     * string). 2. Generate a salt using "$2a$08$" + encoded serial number. 3. BCrypt hash the
+     * SHA-256 hex string using that salt.
+     *
+     * @param serial the serial number of the device (digits only)
+     * @param password the password to hash
+     * @return the hashed password bytes (password hash part only, no salt prefix)
+     * @throws NoSuchAlgorithmException if SHA-256 hash algorithm is not available
+     */
+    private static byte[] hashPasswordWithBCrypt(String serial, String password)
+            throws NoSuchAlgorithmException {
+        // SHA-256 hash of the password
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        String passwordSha256 =
+                bytesToHex(digest.digest(password.getBytes(StandardCharsets.UTF_8)));
+
+        // Prepare Deterministic Salt: $2a$08$ + Encoded Serial
+        String salt = "$2a$08$" + encodeSerialForBCrypt(serial);
+
+        // Hash using jBCrypt and use serial-based salt
+        String fullHash = BCrypt.hashpw(passwordSha256, salt);
+
+        // Extract the password hash part (substring after the salt prefix)
+        String pwHash = fullHash.substring(salt.length());
+
+        return pwHash.getBytes(StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Encodes the serial number into a BCrypt-compatible salt string.
+     *
+     * @param serial the serial number of the device (expects digits only)
+     * @throws IllegalArgumentException if serial contains non-digit characters
+     */
+    private static String encodeSerialForBCrypt(String serial) {
+        if (!serial.matches("\\d+")) {
+            throw new IllegalArgumentException("Serial must be digits only");
+        }
+
+        // Convert serial digits to a 16-byte array of raw values (0-9)
+        int length = 16;
+        byte[] b = new byte[16];
+        int offset = 16 - serial.length();
+        for (int i = 0; i < serial.length(); i++) {
+            if (offset + i >= 0) {
+                b[offset + i] = (byte) (serial.charAt(i) - '0');
+            }
+        }
+
+        return BCrypt.encode_base64(b, length);
+    }
+
+    /**
+     * Hashes the password using PBKDF2 with HMAC-SHA512 with the serial number as salt, encodes it
+     * with Base64, and truncates to 32 bytes.
      *
      * @param serial the serial number of the device
      * @param password the password to hash
      * @return the hashed, truncated password
      * @throws NoSuchAlgorithmException if PBKDF2WithHmacSHA512 key algorithm is not available
      */
-    static byte[] hashPassword(String serial, String password) throws NoSuchAlgorithmException {
+    private static byte[] hashPasswordWithPKDF2(String serial, String password)
+            throws NoSuchAlgorithmException {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
         KeySpec spec =
                 new PBEKeySpec(
@@ -65,7 +163,7 @@ final class AuthUtil {
                         serial.getBytes(StandardCharsets.UTF_8),
                         100000,
                         256 * 8);
-        byte[] hash = null;
+        byte[] hash;
         try {
             hash = factory.generateSecret(spec).getEncoded();
         } catch (InvalidKeySpecException e) {
@@ -78,7 +176,8 @@ final class AuthUtil {
     /**
      * Creates an AuthMessage from the hashed password and the tokens provided by the wallbox.
      *
-     * @param hashedPassword the hashed password, see {@link #hashPassword(String, String)}
+     * @param hashedPassword the hashed password, see {@link #hashPassword(String, String,
+     *     HashAlgorithm)}
      * @param token1 the first token provided by the wallbox, see {@link AuthRequiredMessage}
      * @param token2 the second token provided by the wallbox, see {@link AuthRequiredMessage}
      * @return the AuthMessage to send to the wallbox
@@ -112,7 +211,8 @@ final class AuthUtil {
     /**
      * Creates a HMAC from the hashed password and the data to send.
      *
-     * @param hashedPassword the hashed password, see {@link #hashPassword(String, String)}
+     * @param hashedPassword the hashed password, see {@link #hashPassword(String, String,
+     *     HashAlgorithm)}
      * @param data the data to send
      * @return the HMAC as a hex string
      * @throws NoSuchAlgorithmException ir HMAC-SHA256 algorithm is not available

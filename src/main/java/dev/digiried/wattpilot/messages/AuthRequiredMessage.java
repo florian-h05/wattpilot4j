@@ -27,6 +27,7 @@ package dev.digiried.wattpilot.messages;
 public class AuthRequiredMessage extends IncomingMessage {
     public String token1;
     public String token2;
+    public String hash;
 
     public AuthRequiredMessage() {
         super(MessageType.AUTH_REQUIRED);

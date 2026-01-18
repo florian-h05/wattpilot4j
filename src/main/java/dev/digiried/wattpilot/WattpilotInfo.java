@@ -22,11 +22,12 @@ package dev.digiried.wattpilot;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * Record for Wattpilot information received on connection establishment.
+ * Record for Wattpilot information received on the connection establishment.
  *
  * @param serial serial number of the wallbox
  * @param hostname hostname of the wallbox
- * @param friendlyName friendly name of the wallbox, i.e. what is displayed in the app
+ * @param friendlyName friendly name of the wallbox, i.e., what is displayed in the app
+ * @param deviceType the device type, e.g., "wattpilot_flex"
  * @param firmwareVersion firmware version of the wallbox
  * @param protocolVersion protocol version
  * @param secured whether the connection has to be authenticated
@@ -37,6 +38,7 @@ public record WattpilotInfo(
         String serial,
         String hostname,
         String friendlyName,
+        String deviceType,
         String firmwareVersion,
         int protocolVersion,
         boolean secured) {}
