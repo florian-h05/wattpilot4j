@@ -34,7 +34,10 @@ public class HelloMessage extends IncomingMessage {
     public String friendlyName;
 
     public String manufacturer;
-    public String devicetype;
+
+    @SerializedName("devicetype")
+    public String deviceType;
+
     public String version;
     public int protocol;
     public boolean secured;

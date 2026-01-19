@@ -467,6 +467,7 @@ public class WattpilotClient {
                                 hm.serial,
                                 hm.hostname,
                                 hm.friendlyName,
+                                hm.deviceType,
                                 hm.version,
                                 hm.protocol,
                                 hm.secured);
@@ -481,8 +482,24 @@ public class WattpilotClient {
 
             if (m instanceof AuthRequiredMessage arm) {
                 logger.trace("Received AuthRequiredMessage");
+                AuthUtil.HashAlgorithm hash = AuthUtil.HashAlgorithm.PBKDF2;
+                if (arm.hash != null && !arm.hash.isBlank()) {
+                    logger.debug("Wattpilot requested {} hash algorithm.", arm.hash);
+                    AuthUtil.HashAlgorithm requestedHash =
+                            AuthUtil.HashAlgorithm.fromString(arm.hash);
+                    if (requestedHash != null) {
+                        hash = requestedHash;
+                    } else {
+                        logger.warn(
+                                "Wattpilot requested unknown hash algorithm {}, falling back to"
+                                        + " default.",
+                                arm.hash);
+                    }
+                } else if ("wattpilot_flex".equals(wattpilotInfo.deviceType())) {
+                    hash = AuthUtil.HashAlgorithm.BCRYPT;
+                }
                 try {
-                    hashedPassword = AuthUtil.hashPassword(wattpilotInfo.serial(), password);
+                    hashedPassword = AuthUtil.hashPassword(wattpilotInfo.serial(), password, hash);
                     AuthMessage authMessage =
                             AuthUtil.createAuthMessage(hashedPassword, arm.token1, arm.token2);
                     String json = gson.toJson(authMessage);

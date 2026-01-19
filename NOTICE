@@ -9,3 +9,9 @@ https://www.apache.org/licenses/LICENSE-2.0.
 == Source Code
 
 https://github.com/florian-h05/wattpilot4j
+
+== Third-party Content
+
+This library includes classes from jBCrypt in the src/3rdparty/java folder.
+* License: ISC License
+* Project: https://github.com/jeremyh/jBCrypt

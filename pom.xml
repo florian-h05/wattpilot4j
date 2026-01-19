@@ -80,6 +80,25 @@
 
   <build>
     <plugins>
+      <!-- Build Helper Plugin to add sources -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.6.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sources>
+                <source>src/3rdparty/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Eclipse Compiler and LastNPE EEA for Null Annotations -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
