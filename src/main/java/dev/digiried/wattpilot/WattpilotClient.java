@@ -492,8 +492,9 @@ public class WattpilotClient {
                     } else {
                         logger.warn(
                                 "Wattpilot requested unknown hash algorithm {}, falling back to"
-                                        + " default.",
-                                arm.hash);
+                                        + " {}.",
+                                arm.hash,
+                                hash);
                     }
                 } else if ("wattpilot_flex".equals(wattpilotInfo.deviceType())) {
                     hash = AuthUtil.HashAlgorithm.BCRYPT;
