@@ -619,6 +619,10 @@ public class WattpilotClient {
                 wattpilotStatus.setChargingAllowed(status.isChargingAllowed());
                 hasChanged = true;
             }
+            if (status.getAccessState() != null) {
+                wattpilotStatus.setAccessState(status.getAccessState());
+                hasChanged = true;
+            }
             if (status.isBoostEnabled() != null) {
                 wattpilotStatus.setBoostEnabled(status.isBoostEnabled());
                 hasChanged = true;

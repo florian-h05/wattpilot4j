@@ -30,6 +30,7 @@ import dev.digiried.wattpilot.commands.SetBoostSoCLimitCommand;
 import dev.digiried.wattpilot.commands.SetChargingCurrentCommand;
 import dev.digiried.wattpilot.commands.SetChargingModeCommand;
 import dev.digiried.wattpilot.commands.SetEnforcedChargingStateCommand;
+import dev.digiried.wattpilot.commands.SetOpenAccessStateCommand;
 import dev.digiried.wattpilot.commands.SetSurplusPowerThresholdCommand;
 import dev.digiried.wattpilot.commands.SetSurplusSoCThresholdCommand;
 import dev.digiried.wattpilot.dto.ChargingMode;
@@ -97,6 +98,8 @@ public class App implements WattpilotClientListener {
                 break;
             } else if (line.equals("status")) {
                 printStatus(client.getDeviceInfo(), client.getStatus());
+            } else if (line.equals("enable access")) {
+                sendCommand(new SetOpenAccessStateCommand(), client);
             } else if (line.startsWith("set")) {
                 String[] parts = line.split(" ");
                 if (parts.length == 3) {
@@ -137,6 +140,7 @@ wattpilot4j Shell - Copyright (c) 2025 Florian Hotze under Apache License, Versi
 
 Commands:
   status                                    get the current status of the wallbox
+  enable access                             set access state to OPEN
   set current <current>                     set the charging current in A [6-32]
   set force <state>                         set the enforced charging state (ON, OFF, NEUTRAL)
   set mode <mode>                           set the charging mode (DEFAULT, ECO, NEXT_TRIP)
@@ -161,6 +165,7 @@ Commands:
         System.out.println("  Firmware Version: " + info.firmwareVersion());
 
         System.out.println("Configuration:");
+        System.out.println("  Access State: " + status.getAccessState());
         System.out.println("  Charging Enforced: " + status.getEnforcedChargingState());
         System.out.println("  Charging Mode: " + status.getChargingMode());
         System.out.println("  Charging Current: " + status.getChargingCurrent() + " A");
@@ -200,12 +205,7 @@ Commands:
                         default -> null;
                     };
             if (command != null) {
-                CommandResponse res = client.sendCommand(command).get(5, TimeUnit.SECONDS);
-                if (res.success()) {
-                    System.out.println("Command successful");
-                } else {
-                    System.err.println("Command failed");
-                }
+                sendCommand(command, client);
             } else {
                 System.err.println("Invalid command: " + line);
             }
@@ -214,6 +214,16 @@ Commands:
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
             System.err.println("Invalid argument: " + e.getMessage());
+        }
+    }
+
+    private static void sendCommand(Command command, WattpilotClient client)
+            throws InterruptedException, ExecutionException, TimeoutException {
+        CommandResponse res = client.sendCommand(command).get(5, TimeUnit.SECONDS);
+        if (res.success()) {
+            System.out.println("Command successful");
+        } else {
+            System.err.println("Command failed");
         }
     }
 }

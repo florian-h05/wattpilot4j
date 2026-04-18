@@ -35,6 +35,9 @@ public class PartialStatus {
     @SerializedName(PropertyKeys.ALLOW_CHARGING)
     Boolean allowCharging;
 
+    @SerializedName(PropertyKeys.ACCESS_STATE)
+    Integer accessState;
+
     @SerializedName(PropertyKeys.BOOST_ENABLED)
     Boolean boost;
 
@@ -81,6 +84,18 @@ public class PartialStatus {
      */
     public Boolean isChargingAllowed() {
         return allowCharging;
+    }
+
+    /**
+     * Get the configured access state.
+     *
+     * @return
+     */
+    public AccessState getAccessState() {
+        if (accessState == null) {
+            return null;
+        }
+        return AccessState.fromValue(accessState);
     }
 
     /**

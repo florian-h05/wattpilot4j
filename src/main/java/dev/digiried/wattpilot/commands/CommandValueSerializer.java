@@ -19,6 +19,7 @@
  */
 package dev.digiried.wattpilot.commands;
 
+import dev.digiried.wattpilot.dto.AccessState;
 import dev.digiried.wattpilot.dto.ChargingMode;
 import dev.digiried.wattpilot.dto.EnforcedChargingState;
 
@@ -42,6 +43,8 @@ public class CommandValueSerializer implements JsonSerializer<CommandValue<?>> {
             CommandValue<?> commandValue, Type type, JsonSerializationContext context) {
         if (commandValue.value() instanceof ChargingMode cm) {
             return new JsonPrimitive(cm.toValue());
+        } else if (commandValue.value() instanceof AccessState as) {
+            return new JsonPrimitive(as.toValue());
         } else if (commandValue.value() instanceof EnforcedChargingState es) {
             return new JsonPrimitive(es.toValue());
         } else {

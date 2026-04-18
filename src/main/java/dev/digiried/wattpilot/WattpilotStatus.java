@@ -23,6 +23,7 @@ import dev.digiried.wattpilot.dto.ChargingMetrics;
 import dev.digiried.wattpilot.dto.ChargingMode;
 import dev.digiried.wattpilot.dto.ChargingState;
 import dev.digiried.wattpilot.dto.EnforcedChargingState;
+import dev.digiried.wattpilot.dto.AccessState;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
@@ -36,6 +37,7 @@ public class WattpilotStatus {
     private boolean boostEnabled;
     private int boostSoCLimit;
     private boolean chargingAllowed;
+    private @NonNullByDefault({}) AccessState accessState;
     private int chargingCurrent;
     private @NonNullByDefault({}) ChargingState chargingState;
     private @NonNullByDefault({}) EnforcedChargingState enforcedState;
@@ -59,6 +61,7 @@ public class WattpilotStatus {
         this.boostEnabled = other.boostEnabled;
         this.boostSoCLimit = other.boostSoCLimit;
         this.chargingAllowed = other.chargingAllowed;
+        this.accessState = other.accessState;
         this.chargingCurrent = other.chargingCurrent;
         this.chargingState = other.chargingState;
         this.enforcedState = other.enforcedState;
@@ -97,6 +100,15 @@ public class WattpilotStatus {
      */
     public boolean isChargingAllowed() {
         return chargingAllowed;
+    }
+
+    /**
+     * Get the configured access state.
+     *
+     * @return the configured access state
+     */
+    public AccessState getAccessState() {
+        return accessState;
     }
 
     /**
@@ -204,6 +216,10 @@ public class WattpilotStatus {
 
     void setChargingAllowed(boolean chargingAllowed) {
         this.chargingAllowed = chargingAllowed;
+    }
+
+    void setAccessState(AccessState accessState) {
+        this.accessState = accessState;
     }
 
     void setChargingCurrent(int chargingCurrent) {
