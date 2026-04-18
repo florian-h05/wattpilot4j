@@ -20,24 +20,24 @@
 package dev.digiried.wattpilot.dto;
 
 /**
- * Enum for the access state configuration.
+ * Enum for the authorization state configuration.
  *
  * @author Florian Hotze - Initial contribution
  */
-public enum AccessState {
-    /** Access open. */
-    OPEN(0),
-    /** Access pending/waiting. */
-    WAIT(1);
+public enum AuthorizationState {
+    /** Charging is authorized. */
+    AUTHORIZED(0),
+    /** Charging authorization is waiting. */
+    WAITING(1);
 
     private final int value;
 
-    AccessState(int value) {
+    AuthorizationState(int value) {
         this.value = value;
     }
 
     /**
-     * Get the API value of the access state.
+     * Get the API value of the authorization state.
      *
      * @return the API value
      */
@@ -46,13 +46,13 @@ public enum AccessState {
     }
 
     /**
-     * Get the access state from the API value.
+     * Get the authorization state from the API value.
      *
      * @param value the API value
-     * @return the access state, or <code>null</code> if the API value is unknown
+     * @return the authorization state, or <code>null</code> if the API value is unknown
      */
-    public static AccessState fromValue(int value) {
-        for (AccessState state : AccessState.values()) {
+    public static AuthorizationState fromValue(int value) {
+        for (AuthorizationState state : AuthorizationState.values()) {
             if (state.value == value) {
                 return state;
             }

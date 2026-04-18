@@ -19,28 +19,28 @@
  */
 package dev.digiried.wattpilot.commands;
 
-import dev.digiried.wattpilot.dto.AccessState;
+import dev.digiried.wattpilot.dto.AuthorizationState;
 import dev.digiried.wattpilot.dto.PropertyKeys;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * Command to set the access state of the wallbox to open.
+ * Command to authorize charging.
  *
  * @author Florian Hotze - Initial contribution
  */
 @NonNullByDefault
-public class SetOpenAccessStateCommand extends Command {
-    private final CommandValue<AccessState> value;
+public class AuthorizeChargingCommand extends Command {
+    private final CommandValue<AuthorizationState> value;
 
-    /** Create a new command to set access state to open. */
-    public SetOpenAccessStateCommand() {
+    /** Create a new command to authorize charging. */
+    public AuthorizeChargingCommand() {
         super(PropertyKeys.ACCESS_STATE);
-        this.value = new CommandValue<>(AccessState.OPEN);
+        this.value = new CommandValue<>(AuthorizationState.AUTHORIZED);
     }
 
     @Override
-    public CommandValue<AccessState> getValue() {
+    public CommandValue<AuthorizationState> getValue() {
         return value;
     }
 }

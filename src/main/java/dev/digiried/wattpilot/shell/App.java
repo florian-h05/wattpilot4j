@@ -23,6 +23,7 @@ import dev.digiried.wattpilot.WattpilotClient;
 import dev.digiried.wattpilot.WattpilotClientListener;
 import dev.digiried.wattpilot.WattpilotInfo;
 import dev.digiried.wattpilot.WattpilotStatus;
+import dev.digiried.wattpilot.commands.AuthorizeChargingCommand;
 import dev.digiried.wattpilot.commands.Command;
 import dev.digiried.wattpilot.commands.CommandResponse;
 import dev.digiried.wattpilot.commands.SetBoostCommand;
@@ -30,7 +31,6 @@ import dev.digiried.wattpilot.commands.SetBoostSoCLimitCommand;
 import dev.digiried.wattpilot.commands.SetChargingCurrentCommand;
 import dev.digiried.wattpilot.commands.SetChargingModeCommand;
 import dev.digiried.wattpilot.commands.SetEnforcedChargingStateCommand;
-import dev.digiried.wattpilot.commands.SetOpenAccessStateCommand;
 import dev.digiried.wattpilot.commands.SetSurplusPowerThresholdCommand;
 import dev.digiried.wattpilot.commands.SetSurplusSoCThresholdCommand;
 import dev.digiried.wattpilot.dto.ChargingMode;
@@ -98,9 +98,9 @@ public class App implements WattpilotClientListener {
                 break;
             } else if (line.equals("status")) {
                 printStatus(client.getDeviceInfo(), client.getStatus());
-            } else if (line.equals("enable access")) {
+            } else if (line.equals("authorize charging")) {
                 try {
-                    sendCommand(new SetOpenAccessStateCommand(), client);
+                    sendCommand(new AuthorizeChargingCommand(), client);
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
                     System.err.println("Failed to send command: " + e.getMessage());
                     e.printStackTrace();
@@ -145,7 +145,7 @@ wattpilot4j Shell - Copyright (c) 2025 Florian Hotze under Apache License, Versi
 
 Commands:
   status                                    get the current status of the wallbox
-  enable access                             set access state to OPEN
+  authorize charging                        authorize charging
   set current <current>                     set the charging current in A [6-32]
   set force <state>                         set the enforced charging state (ON, OFF, NEUTRAL)
   set mode <mode>                           set the charging mode (DEFAULT, ECO, NEXT_TRIP)
@@ -170,7 +170,7 @@ Commands:
         System.out.println("  Firmware Version: " + info.firmwareVersion());
 
         System.out.println("Configuration:");
-        System.out.println("  Access State: " + status.getAccessState());
+        System.out.println("  Authorization State: " + status.getAuthorizationState());
         System.out.println("  Charging Enforced: " + status.getEnforcedChargingState());
         System.out.println("  Charging Mode: " + status.getChargingMode());
         System.out.println("  Charging Current: " + status.getChargingCurrent() + " A");

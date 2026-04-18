@@ -19,7 +19,7 @@
  */
 package dev.digiried.wattpilot;
 
-import dev.digiried.wattpilot.dto.AccessState;
+import dev.digiried.wattpilot.dto.AuthorizationState;
 import dev.digiried.wattpilot.dto.ChargingMetrics;
 import dev.digiried.wattpilot.dto.ChargingMode;
 import dev.digiried.wattpilot.dto.ChargingState;
@@ -37,7 +37,7 @@ public class WattpilotStatus {
     private boolean boostEnabled;
     private int boostSoCLimit;
     private boolean chargingAllowed;
-    private @NonNullByDefault({}) AccessState accessState;
+    private @NonNullByDefault({}) AuthorizationState authorizationState;
     private int chargingCurrent;
     private @NonNullByDefault({}) ChargingState chargingState;
     private @NonNullByDefault({}) EnforcedChargingState enforcedState;
@@ -61,7 +61,7 @@ public class WattpilotStatus {
         this.boostEnabled = other.boostEnabled;
         this.boostSoCLimit = other.boostSoCLimit;
         this.chargingAllowed = other.chargingAllowed;
-        this.accessState = other.accessState;
+        this.authorizationState = other.authorizationState;
         this.chargingCurrent = other.chargingCurrent;
         this.chargingState = other.chargingState;
         this.enforcedState = other.enforcedState;
@@ -103,12 +103,12 @@ public class WattpilotStatus {
     }
 
     /**
-     * Get the configured access state.
+     * Get the configured authorization state.
      *
-     * @return the configured access state
+     * @return the configured authorization state
      */
-    public AccessState getAccessState() {
-        return accessState;
+    public AuthorizationState getAuthorizationState() {
+        return authorizationState;
     }
 
     /**
@@ -218,8 +218,8 @@ public class WattpilotStatus {
         this.chargingAllowed = chargingAllowed;
     }
 
-    void setAccessState(AccessState accessState) {
-        this.accessState = accessState;
+    void setAuthorizationState(AuthorizationState authorizationState) {
+        this.authorizationState = authorizationState;
     }
 
     void setChargingCurrent(int chargingCurrent) {
