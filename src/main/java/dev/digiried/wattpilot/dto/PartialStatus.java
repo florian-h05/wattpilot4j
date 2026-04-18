@@ -89,7 +89,7 @@ public class PartialStatus {
     /**
      * Get the configured access state.
      *
-     * @return
+     * @return the configured access state, or <code>null</code> if not available or unknown
      */
     public AccessState getAccessState() {
         if (accessState == null) {

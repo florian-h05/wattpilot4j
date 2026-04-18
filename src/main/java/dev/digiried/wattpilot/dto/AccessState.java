@@ -49,7 +49,7 @@ public enum AccessState {
      * Get the access state from the API value.
      *
      * @param value the API value
-     * @return the access state
+     * @return the access state, or <code>null</code> if the API value is unknown
      */
     public static AccessState fromValue(int value) {
         for (AccessState state : AccessState.values()) {

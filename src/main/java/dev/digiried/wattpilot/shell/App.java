@@ -99,7 +99,12 @@ public class App implements WattpilotClientListener {
             } else if (line.equals("status")) {
                 printStatus(client.getDeviceInfo(), client.getStatus());
             } else if (line.equals("enable access")) {
-                sendCommand(new SetOpenAccessStateCommand(), client);
+                try {
+                    sendCommand(new SetOpenAccessStateCommand(), client);
+                } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                    System.err.println("Failed to send command: " + e.getMessage());
+                    e.printStackTrace();
+                }
             } else if (line.startsWith("set")) {
                 String[] parts = line.split(" ");
                 if (parts.length == 3) {

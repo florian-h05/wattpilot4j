@@ -19,11 +19,11 @@
  */
 package dev.digiried.wattpilot;
 
+import dev.digiried.wattpilot.dto.AccessState;
 import dev.digiried.wattpilot.dto.ChargingMetrics;
 import dev.digiried.wattpilot.dto.ChargingMode;
 import dev.digiried.wattpilot.dto.ChargingState;
 import dev.digiried.wattpilot.dto.EnforcedChargingState;
-import dev.digiried.wattpilot.dto.AccessState;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
