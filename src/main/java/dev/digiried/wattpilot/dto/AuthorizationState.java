@@ -27,7 +27,7 @@ package dev.digiried.wattpilot.dto;
 public enum AuthorizationState {
     /** Charging is authorized. */
     AUTHORIZED(0),
-    /** Charging authorization is waiting. */
+    /** Waiting for charging authorization. */
     WAITING(1);
 
     private final int value;

@@ -35,7 +35,7 @@ public class AuthorizeChargingCommand extends Command {
 
     /** Create a new command to authorize charging. */
     public AuthorizeChargingCommand() {
-        super(PropertyKeys.ACCESS_STATE);
+        super(PropertyKeys.AUTHORIZATION_STATE);
         this.value = new CommandValue<>(AuthorizationState.AUTHORIZED);
     }
 

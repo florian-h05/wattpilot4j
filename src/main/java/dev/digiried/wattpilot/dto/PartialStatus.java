@@ -35,7 +35,7 @@ public class PartialStatus {
     @SerializedName(PropertyKeys.ALLOW_CHARGING)
     Boolean allowCharging;
 
-    @SerializedName(PropertyKeys.ACCESS_STATE)
+    @SerializedName(PropertyKeys.AUTHORIZATION_STATE)
     Integer authorizationState;
 
     @SerializedName(PropertyKeys.BOOST_ENABLED)
