@@ -23,9 +23,9 @@ import dev.digiried.wattpilot.WattpilotClient;
 import dev.digiried.wattpilot.WattpilotClientListener;
 import dev.digiried.wattpilot.WattpilotInfo;
 import dev.digiried.wattpilot.WattpilotStatus;
-import dev.digiried.wattpilot.commands.AuthorizeChargingCommand;
 import dev.digiried.wattpilot.commands.Command;
 import dev.digiried.wattpilot.commands.CommandResponse;
+import dev.digiried.wattpilot.commands.SetAuthorizationStateCommand;
 import dev.digiried.wattpilot.commands.SetBoostCommand;
 import dev.digiried.wattpilot.commands.SetBoostSoCLimitCommand;
 import dev.digiried.wattpilot.commands.SetChargingCurrentCommand;
@@ -33,6 +33,7 @@ import dev.digiried.wattpilot.commands.SetChargingModeCommand;
 import dev.digiried.wattpilot.commands.SetEnforcedChargingStateCommand;
 import dev.digiried.wattpilot.commands.SetSurplusPowerThresholdCommand;
 import dev.digiried.wattpilot.commands.SetSurplusSoCThresholdCommand;
+import dev.digiried.wattpilot.dto.AuthorizationState;
 import dev.digiried.wattpilot.dto.ChargingMode;
 import dev.digiried.wattpilot.dto.EnforcedChargingState;
 
@@ -98,13 +99,6 @@ public class App implements WattpilotClientListener {
                 break;
             } else if (line.equals("status")) {
                 printStatus(client.getDeviceInfo(), client.getStatus());
-            } else if (line.equals("authorize charging")) {
-                try {
-                    sendCommand(new AuthorizeChargingCommand(), client);
-                } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                    System.err.println("Failed to send command: " + e.getMessage());
-                    e.printStackTrace();
-                }
             } else if (line.startsWith("set")) {
                 String[] parts = line.split(" ");
                 if (parts.length == 3) {
@@ -145,7 +139,7 @@ wattpilot4j Shell - Copyright (c) 2025 Florian Hotze under Apache License, Versi
 
 Commands:
   status                                    get the current status of the wallbox
-  authorize charging                        authorize charging
+  set auth <state>                          set the authorization state (AUTHORIZED, WAITING)
   set current <current>                     set the charging current in A [6-32]
   set force <state>                         set the enforced charging state (ON, OFF, NEUTRAL)
   set mode <mode>                           set the charging mode (DEFAULT, ECO, NEXT_TRIP)
@@ -195,6 +189,9 @@ Commands:
         try {
             Command command =
                     switch (parts[1]) {
+                        case "auth" ->
+                                new SetAuthorizationStateCommand(
+                                        AuthorizationState.valueOf(parts[2]));
                         case "current" -> new SetChargingCurrentCommand(Integer.parseInt(parts[2]));
                         case "force" ->
                                 new SetEnforcedChargingStateCommand(

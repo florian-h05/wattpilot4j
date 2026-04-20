@@ -25,18 +25,22 @@ import dev.digiried.wattpilot.dto.PropertyKeys;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 
 /**
- * Command to authorize charging.
+ * Command to set the authorization state.
  *
  * @author Florian Hotze - Initial contribution
  */
 @NonNullByDefault
-public class AuthorizeChargingCommand extends Command {
+public class SetAuthorizationStateCommand extends Command {
     private final CommandValue<AuthorizationState> value;
 
-    /** Create a new command to authorize charging. */
-    public AuthorizeChargingCommand() {
+    /**
+     * Create a new command to set the authorization state.
+     *
+     * @param state the authorization state
+     */
+    public SetAuthorizationStateCommand(AuthorizationState state) {
         super(PropertyKeys.AUTHORIZATION_STATE);
-        this.value = new CommandValue<>(AuthorizationState.AUTHORIZED);
+        this.value = new CommandValue<>(state);
     }
 
     @Override
