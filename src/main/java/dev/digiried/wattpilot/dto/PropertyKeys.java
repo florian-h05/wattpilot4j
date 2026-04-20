@@ -32,6 +32,9 @@ public final class PropertyKeys {
     /** Charging allowed/possible (RO) */
     public static final String ALLOW_CHARGING = "alw";
 
+    /** Charging authorization state (RW) */
+    public static final String AUTHORIZATION_STATE = "acs";
+
     /** Charging boost enabled (boost is only available in eco or next trip mode) (RW) */
     public static final String BOOST_ENABLED = "ebe";
 

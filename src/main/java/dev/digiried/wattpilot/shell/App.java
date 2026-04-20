@@ -25,6 +25,7 @@ import dev.digiried.wattpilot.WattpilotInfo;
 import dev.digiried.wattpilot.WattpilotStatus;
 import dev.digiried.wattpilot.commands.Command;
 import dev.digiried.wattpilot.commands.CommandResponse;
+import dev.digiried.wattpilot.commands.SetAuthorizationStateCommand;
 import dev.digiried.wattpilot.commands.SetBoostCommand;
 import dev.digiried.wattpilot.commands.SetBoostSoCLimitCommand;
 import dev.digiried.wattpilot.commands.SetChargingCurrentCommand;
@@ -32,6 +33,7 @@ import dev.digiried.wattpilot.commands.SetChargingModeCommand;
 import dev.digiried.wattpilot.commands.SetEnforcedChargingStateCommand;
 import dev.digiried.wattpilot.commands.SetSurplusPowerThresholdCommand;
 import dev.digiried.wattpilot.commands.SetSurplusSoCThresholdCommand;
+import dev.digiried.wattpilot.dto.AuthorizationState;
 import dev.digiried.wattpilot.dto.ChargingMode;
 import dev.digiried.wattpilot.dto.EnforcedChargingState;
 
@@ -137,6 +139,7 @@ wattpilot4j Shell - Copyright (c) 2025 Florian Hotze under Apache License, Versi
 
 Commands:
   status                                    get the current status of the wallbox
+  set auth <state>                          set the authorization state (AUTHORIZED, WAITING)
   set current <current>                     set the charging current in A [6-32]
   set force <state>                         set the enforced charging state (ON, OFF, NEUTRAL)
   set mode <mode>                           set the charging mode (DEFAULT, ECO, NEXT_TRIP)
@@ -161,6 +164,7 @@ Commands:
         System.out.println("  Firmware Version: " + info.firmwareVersion());
 
         System.out.println("Configuration:");
+        System.out.println("  Authorization State: " + status.getAuthorizationState());
         System.out.println("  Charging Enforced: " + status.getEnforcedChargingState());
         System.out.println("  Charging Mode: " + status.getChargingMode());
         System.out.println("  Charging Current: " + status.getChargingCurrent() + " A");
@@ -185,6 +189,9 @@ Commands:
         try {
             Command command =
                     switch (parts[1]) {
+                        case "auth" ->
+                                new SetAuthorizationStateCommand(
+                                        AuthorizationState.valueOf(parts[2]));
                         case "current" -> new SetChargingCurrentCommand(Integer.parseInt(parts[2]));
                         case "force" ->
                                 new SetEnforcedChargingStateCommand(
@@ -200,12 +207,7 @@ Commands:
                         default -> null;
                     };
             if (command != null) {
-                CommandResponse res = client.sendCommand(command).get(5, TimeUnit.SECONDS);
-                if (res.success()) {
-                    System.out.println("Command successful");
-                } else {
-                    System.err.println("Command failed");
-                }
+                sendCommand(command, client);
             } else {
                 System.err.println("Invalid command: " + line);
             }
@@ -214,6 +216,16 @@ Commands:
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
             System.err.println("Invalid argument: " + e.getMessage());
+        }
+    }
+
+    private static void sendCommand(Command command, WattpilotClient client)
+            throws InterruptedException, ExecutionException, TimeoutException {
+        CommandResponse res = client.sendCommand(command).get(5, TimeUnit.SECONDS);
+        if (res.success()) {
+            System.out.println("Command successful");
+        } else {
+            System.err.println("Command failed");
         }
     }
 }
