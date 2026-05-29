@@ -76,7 +76,6 @@ public class App implements WattpilotClientListener {
 
         try {
             HttpClient httpClient = new HttpClient();
-            httpClient.start();
             client = new WattpilotClient(httpClient, 10, 2);
             client.addListener(this);
             client.connect(host, password).get(3, TimeUnit.SECONDS);
