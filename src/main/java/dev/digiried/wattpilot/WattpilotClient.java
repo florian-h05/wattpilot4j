@@ -397,8 +397,9 @@ public class WattpilotClient {
     }
 
     /** Handles incoming WebSocket messages from the wallbox. */
+    // Class has to be public for Jetty
     @NonNullByDefault({})
-    private class FroniusWebsocketListener implements Session.Listener.AutoDemanding {
+    public class FroniusWebsocketListener implements Session.Listener.AutoDemanding {
         private final String password;
 
         FroniusWebsocketListener(String password) {
