@@ -42,6 +42,7 @@ import dev.digiried.wattpilot.messages.SetValueMessage;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Set;
@@ -60,10 +61,8 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.websocket.api.Callback;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.WebSocketListener;
-import org.eclipse.jetty.websocket.api.WriteCallback;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -187,7 +186,7 @@ public class WattpilotClient {
     public CompletableFuture<@Nullable Void> disconnect() {
         var session = this.session;
         if (session != null && session.isOpen()) {
-            logger.debug("Disconnecting from wallbox at {}", session.getRemoteAddress());
+            logger.debug("Disconnecting from wallbox at {}", session.getRemoteSocketAddress());
             session.close();
             // onDisconnected will be called by the WebsocketListener and perform the clean-up
             return this.disconnectFuture = new CompletableFuture<>();
@@ -307,20 +306,24 @@ public class WattpilotClient {
         pingTask =
                 scheduler.scheduleAtFixedRate(
                         () -> {
-                            try {
-                                logger.debug("Sending PING message");
-                                var session = this.session;
-                                if (session == null) {
-                                    throw new IllegalStateException(
-                                            "No WebSocket session available, this should not"
-                                                    + " happen");
-                                }
-                                session.getRemote().sendString(PING_MESSAGE);
-                                scheduleTimeoutTask();
-                            } catch (IOException e) {
-                                logger.error("Failed to send ping message", e);
-                                onDisconnected("Failed to send ping message", e);
+                            logger.debug("Sending PING message");
+                            var session = this.session;
+                            if (session == null) {
+                                throw new IllegalStateException(
+                                        "No WebSocket session available, this should not"
+                                                + " happen");
                             }
+                            session.sendText(
+                                    PING_MESSAGE,
+                                    new Callback() {
+                                        @NonNullByDefault({})
+                                        @Override
+                                        public void fail(Throwable t) {
+                                            logger.error("Failed to send ping message", t);
+                                            onDisconnected("Failed to send ping message", t);
+                                        }
+                                    });
+                            scheduleTimeoutTask();
                         },
                         pingInterval,
                         pingInterval,
@@ -341,7 +344,7 @@ public class WattpilotClient {
         timeoutTask =
                 scheduler.schedule(
                         () -> {
-                            logger.warn("Ping to {} timed out", session.getRemoteAddress());
+                            logger.warn("Ping to {} timed out", session.getRemoteSocketAddress());
                             onDisconnected(
                                     "Ping timed out",
                                     new IOException("No pong received before ping timed out"));
@@ -375,29 +378,28 @@ public class WattpilotClient {
                     "No WebSocket session available, this should not happen");
         }
         responseFutures.put(messageId, future);
-        session.getRemote()
-                .sendString(
-                        json,
-                        new WriteCallback() {
-                            @Override
-                            public void writeSuccess() {
-                                logger.trace("writeSuccess for messageId {}", messageId);
-                            }
+        session.sendText(
+                json,
+                new Callback() {
+                    @Override
+                    public void succeed() {
+                        logger.trace("writeSuccess for messageId {}", messageId);
+                    }
 
-                            @NonNullByDefault({})
-                            @Override
-                            public void writeFailed(Throwable t) {
-                                responseFutures.remove(messageId);
-                                future.completeExceptionally(t);
-                            }
-                        });
+                    @NonNullByDefault({})
+                    @Override
+                    public void fail(Throwable t) {
+                        responseFutures.remove(messageId);
+                        future.completeExceptionally(t);
+                    }
+                });
         return future;
     }
 
     /** Handles incoming WebSocket messages from the wallbox. */
+    // Class has to be public for Jetty
     @NonNullByDefault({})
-    @WebSocket
-    private class FroniusWebsocketListener implements WebSocketListener {
+    public class FroniusWebsocketListener implements Session.Listener.AutoDemanding {
         private final String password;
 
         FroniusWebsocketListener(String password) {
@@ -423,8 +425,8 @@ public class WattpilotClient {
         }
 
         @Override
-        public void onWebSocketConnect(Session wsSession) {
-            logger.trace("onWebSocketConnect {}", wsSession);
+        public void onWebSocketOpen(Session wsSession) {
+            logger.trace("onWebSocketOpen {}", wsSession);
             session = wsSession;
         }
 
@@ -435,8 +437,9 @@ public class WattpilotClient {
         }
 
         @Override
-        public void onWebSocketBinary(byte[] data, int offset, int len) {
-            logger.trace("onWebSocketBinary {} {} {}", data, offset, len);
+        public void onWebSocketBinary(ByteBuffer data, Callback callback) {
+            logger.trace("onWebSocketBinary {}", data);
+            callback.succeed();
         }
 
         @SuppressWarnings("null")
@@ -505,8 +508,16 @@ public class WattpilotClient {
                             AuthUtil.createAuthMessage(hashedPassword, arm.token1, arm.token2);
                     String json = gson.toJson(authMessage);
                     logger.trace("Sending AuthMessage {}", json);
-                    session.getRemote().sendString(json);
-                } catch (NoSuchAlgorithmException | IOException e) {
+                    session.sendText(
+                            json,
+                            new Callback() {
+                                @NonNullByDefault({})
+                                @Override
+                                public void fail(Throwable t) {
+                                    logger.error("Could not send auth message", t);
+                                }
+                            });
+                } catch (NoSuchAlgorithmException e) {
                     logger.error("Could not send auth message", e);
                 }
             }

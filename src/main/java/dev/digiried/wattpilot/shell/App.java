@@ -37,7 +37,6 @@ import dev.digiried.wattpilot.dto.AuthorizationState;
 import dev.digiried.wattpilot.dto.ChargingMode;
 import dev.digiried.wattpilot.dto.EnforcedChargingState;
 
-import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -80,7 +79,7 @@ public class App implements WattpilotClientListener {
             client = new WattpilotClient(httpClient, 10, 2);
             client.addListener(this);
             client.connect(host, password).get(3, TimeUnit.SECONDS);
-        } catch (IOException | TimeoutException | InterruptedException | ExecutionException e) {
+        } catch (Exception e) {
             System.err.println("Failed to connect to wallbox: " + e.getMessage());
             e.printStackTrace();
             scanner.close();
