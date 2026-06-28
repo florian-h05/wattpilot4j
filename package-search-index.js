@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"dev.digiried.wattpilot"},{"l":"dev.digiried.wattpilot.commands"},{"l":"dev.digiried.wattpilot.dto"},{"l":"dev.digiried.wattpilot.messages"},{"l":"dev.digiried.wattpilot.shell"}];updateSearchResults();
