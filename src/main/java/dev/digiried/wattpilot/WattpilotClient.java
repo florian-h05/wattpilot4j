@@ -52,6 +52,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -97,8 +98,10 @@ public class WattpilotClient {
 
     private final long pingInterval;
     private final long pingTimeout;
-    private @Nullable ScheduledFuture<?> pingTask;
-    private @Nullable ScheduledFuture<?> timeoutTask;
+    private final AtomicReference<@Nullable ScheduledFuture<?>> pingTask =
+            new AtomicReference<>(null);
+    private final AtomicReference<@Nullable ScheduledFuture<?>> timeoutTask =
+            new AtomicReference<>(null);
 
     private volatile @Nullable Session session;
     private volatile boolean isAuthenticated = false;
@@ -303,17 +306,15 @@ public class WattpilotClient {
     }
 
     private void cancelPingTask() {
-        var pingTask = this.pingTask;
+        var pingTask = this.pingTask.getAndSet(null);
         if (pingTask != null) {
             pingTask.cancel(false);
-            this.pingTask = null;
         }
         cancelTimeoutTask();
     }
 
     private void schedulePingTask() {
-        cancelPingTask();
-        pingTask =
+        var task =
                 scheduler.scheduleAtFixedRate(
                         () -> {
                             try {
@@ -334,20 +335,22 @@ public class WattpilotClient {
                         pingInterval,
                         pingInterval,
                         TimeUnit.SECONDS);
+        var oldTask = pingTask.getAndSet(task); // atomic swap
+        if (oldTask != null) {
+            oldTask.cancel(false);
+        }
     }
 
     private void cancelTimeoutTask() {
-        var timeoutTask = this.timeoutTask;
+        var timeoutTask = this.timeoutTask.getAndSet(null);
         if (timeoutTask != null) {
             timeoutTask.cancel(false);
-            this.timeoutTask = null;
         }
     }
 
     @SuppressWarnings("null")
     private void scheduleTimeoutTask() {
-        cancelTimeoutTask();
-        timeoutTask =
+        var task =
                 scheduler.schedule(
                         () -> {
                             logger.warn("Ping to {} timed out", session.getRemoteAddress());
@@ -357,6 +360,10 @@ public class WattpilotClient {
                         },
                         pingTimeout,
                         TimeUnit.SECONDS);
+        var oldTask = timeoutTask.getAndSet(task); // atomic swap
+        if (oldTask != null) {
+            oldTask.cancel(false);
+        }
     }
 
     /**
