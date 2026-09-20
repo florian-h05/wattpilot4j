@@ -150,9 +150,9 @@ public class WattpilotClient {
      * Connect the client to the wallbox.
      *
      * <p>Connection is established asynchronously. Either use the returned {@link
-     * CompletableFuture} or implement {@link WattpilotClientListener#connected()} and {@link
-     * WattpilotClientListener#disconnected} to get notified about connection establishment or
-     * failure.
+     * CompletableFuture} or implement {@link WattpilotClientListener#connected(WattpilotInfo)} and
+     * {@link WattpilotClientListener#disconnected} to get notified about connection establishment
+     * or failure.
      *
      * @param host the hostname or IP address of the wallbox
      * @param password the password to authenticate with
@@ -186,7 +186,7 @@ public class WattpilotClient {
             }
             session = connection.session;
             if (session == null || !session.isOpen()) {
-                onDisconnected(connection, "Disconnected before connection completed", null);
+                onDisconnected(connection, "Disconnected before connection completed", null, null);
                 return CompletableFuture.completedFuture(null);
             }
             disconnectFuture = this.disconnectFuture;
@@ -329,7 +329,7 @@ public class WattpilotClient {
         try {
             client.connect(connection, uri);
         } catch (RuntimeException e) {
-            onDisconnected(connection, "Failed to start connection", e);
+            onDisconnected(connection, "Failed to start connection", e, null);
             throw new IOException("Failed to connect", e);
         }
         return connectedFuture.copy();
@@ -362,7 +362,10 @@ public class WattpilotClient {
                                             public void fail(Throwable t) {
                                                 logger.error("Failed to send ping message", t);
                                                 onDisconnected(
-                                                        origin, "Failed to send ping message", t);
+                                                        origin,
+                                                        "Failed to send ping message",
+                                                        t,
+                                                        null);
                                             }
                                         });
                             } catch (RuntimeException e) {
@@ -390,7 +393,8 @@ public class WattpilotClient {
                             onDisconnected(
                                     origin,
                                     "Ping timed out",
-                                    new IOException("No pong received before ping timed out"));
+                                    new IOException("No pong received before ping timed out"),
+                                    null);
                         },
                         pingTimeout,
                         TimeUnit.SECONDS);
@@ -543,12 +547,16 @@ public class WattpilotClient {
         }
 
         @Override
-        public void onWebSocketClose(int code, String reason) {
+        public void onWebSocketClose(int code, String reason, Callback callback) {
             logger.trace("onWebSocketClose {} {}", code, reason);
             // see https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code for CloseEvent
             // codes
             if (code == 1000 || code == 1005) {
-                onDisconnected(WebSocketConnection.this, "Connection was closed gracefully", null);
+                onDisconnected(
+                        WebSocketConnection.this,
+                        "Connection was closed gracefully",
+                        null,
+                        callback::succeed);
                 return;
             }
             onDisconnected(
@@ -558,7 +566,8 @@ public class WattpilotClient {
                             "Connection was closed unexpectedly: code "
                                     + code
                                     + "; reason: "
-                                    + reason));
+                                    + reason),
+                    callback::succeed);
         }
 
         @Override
@@ -579,7 +588,7 @@ public class WattpilotClient {
         @Override
         public void onWebSocketError(Throwable error) {
             logger.debug("onWebSocketError", error);
-            onDisconnected(WebSocketConnection.this, "Connection error", error);
+            onDisconnected(WebSocketConnection.this, "Connection error", error, null);
         }
 
         @Override
@@ -639,7 +648,8 @@ public class WattpilotClient {
                     onDisconnected(
                             this,
                             "Entered illegal state while connecting",
-                            new IOException("Received AuthRequiredMessage before HelloMessage"));
+                            new IOException("Received AuthRequiredMessage before HelloMessage"),
+                            null);
                     return;
                 }
 
@@ -701,7 +711,8 @@ public class WattpilotClient {
                 onDisconnected(
                         WebSocketConnection.this,
                         "Authentication failed",
-                        new IOException("Authentication failed: " + rm.message));
+                        new IOException("Authentication failed: " + rm.message),
+                        null);
             }
 
             if (m instanceof FullStatusMessage fsm) {
@@ -845,7 +856,8 @@ public class WattpilotClient {
     private void onDisconnected(
             WebSocketConnection origin,
             String reason,
-            @Nullable Throwable cause) { // NOSONAR: we want to keep this method here
+            @Nullable Throwable cause,
+            @Nullable Runnable closeCallback) { // NOSONAR: we want to keep this method here
         CompletableFuture<@Nullable Void> connectedFuture;
         CompletableFuture<@Nullable Void> disconnectFuture;
         synchronized (connectionLock) {
@@ -879,6 +891,11 @@ public class WattpilotClient {
             } else {
                 disconnectFuture.complete(null);
             }
+        }
+
+        // Invoke close callback to signal close completion
+        if (closeCallback != null) {
+            closeCallback.run();
         }
     }
 }
