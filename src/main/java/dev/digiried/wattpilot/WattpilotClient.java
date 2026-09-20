@@ -91,19 +91,19 @@ public class WattpilotClient {
     private final Map<String, CompletableFuture<CommandResponse>> responseFutures =
             new ConcurrentHashMap<>();
 
-    private @Nullable CompletableFuture<@Nullable Void> connectedFuture = null;
-    private @Nullable CompletableFuture<@Nullable Void> disconnectFuture = null;
+    private volatile @Nullable CompletableFuture<@Nullable Void> connectedFuture = null;
+    private volatile @Nullable CompletableFuture<@Nullable Void> disconnectFuture = null;
 
     private final long pingInterval;
     private final long pingTimeout;
     private @Nullable ScheduledFuture<?> pingTask;
     private @Nullable ScheduledFuture<?> timeoutTask;
 
-    private @Nullable Session session;
-    private boolean isAuthenticated = false;
-    private boolean isInitialized = false;
-    private byte[] hashedPassword = new byte[0];
-    private @Nullable WattpilotInfo wattpilotInfo;
+    private volatile @Nullable Session session;
+    private volatile boolean isAuthenticated = false;
+    private volatile boolean isInitialized = false;
+    private volatile byte[] hashedPassword = new byte[0];
+    private volatile @Nullable WattpilotInfo wattpilotInfo;
 
     private final Object sendCommandLock = new Object();
     private volatile int requestCounter = 0;
