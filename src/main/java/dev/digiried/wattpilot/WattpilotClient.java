@@ -184,7 +184,7 @@ public class WattpilotClient {
             if (connection == null) {
                 return CompletableFuture.completedFuture(null);
             }
-            session = connection.getSession();
+            session = connection.session;
             if (session == null || !session.isOpen()) {
                 onDisconnected(connection, "Disconnected before connection completed", null);
                 return CompletableFuture.completedFuture(null);
@@ -235,7 +235,7 @@ public class WattpilotClient {
      */
     public @Nullable WattpilotStatus getStatus() {
         var connection = this.connection;
-        if (connection == null || !connection.isInitialized()) {
+        if (connection == null || !connection.initialized) {
             return null;
         }
 
@@ -350,7 +350,7 @@ public class WattpilotClient {
                                         origin); // make sure to schedule the timeout task before
                                 // sending PING, so a PONG response is guaranteed
                                 // to find a scheduled timeout task
-                                var session = origin.getSession();
+                                var session = origin.session;
                                 if (session == null) {
                                     return;
                                 }
@@ -383,7 +383,7 @@ public class WattpilotClient {
                             if (connection != origin) {
                                 return; // connection already torn down
                             }
-                            var session = origin.getSession();
+                            var session = origin.session;
                             logger.warn(
                                     "Ping to {} timed out",
                                     session != null ? session.getRemoteSocketAddress() : null);
@@ -436,17 +436,9 @@ public class WattpilotClient {
             this.password = password;
         }
 
-        private @Nullable Session getSession() {
-            return session;
-        }
-
         private boolean isConnected() {
             var session = this.session;
             return session != null && session.isOpen() && authenticated;
-        }
-
-        private boolean isInitialized() {
-            return initialized;
         }
 
         void setPingTask(ScheduledFuture<?> task) {
@@ -648,6 +640,7 @@ public class WattpilotClient {
                             this,
                             "Entered illegal state while connecting",
                             new IOException("Received AuthRequiredMessage before HelloMessage"));
+                    return;
                 }
 
                 AuthUtil.HashAlgorithm hash = AuthUtil.HashAlgorithm.PBKDF2;
