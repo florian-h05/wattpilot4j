@@ -174,21 +174,18 @@ public class WattpilotClient {
      * @return future that completes once the client has successfully disconnected
      */
     public CompletableFuture<@Nullable Void> disconnect() {
-        var connection = this.connection;
-        if (connection == null) {
-            return CompletableFuture.completedFuture(null);
-        }
-        var session = connection.getSession();
-        if (session == null || !session.isOpen()) {
-            return CompletableFuture.completedFuture(null);
-        }
-
         // Atomically get-check-and-set disconnectFuture.
         // Note: AtomicReference only provides a checkAndSet, but no combination of get, check and
         // set, so we can't use it here.
         CompletableFuture<@Nullable Void> disconnectFuture;
+        Session session;
         synchronized (connectionLock) {
-            if (this.connection != connection) {
+            var connection = this.connection;
+            if (connection == null) {
+                return CompletableFuture.completedFuture(null);
+            }
+            session = connection.getSession();
+            if (session == null || !session.isOpen()) {
                 return CompletableFuture.completedFuture(null);
             }
             disconnectFuture = this.disconnectFuture;
@@ -543,7 +540,6 @@ public class WattpilotClient {
                             logger.trace("writeSuccess for messageId {}", messageId);
                         }
 
-                        @NonNullByDefault({})
                         @Override
                         public void fail(Throwable t) {
                             responseFutures.remove(messageId);
@@ -599,7 +595,6 @@ public class WattpilotClient {
             callback.succeed();
         }
 
-        @SuppressWarnings("null")
         @Override
         public void onWebSocketText(String message) {
             if (connection != WebSocketConnection.this) {
@@ -646,6 +641,11 @@ public class WattpilotClient {
 
             if (m instanceof AuthRequiredMessage arm) {
                 logger.trace("Received AuthRequiredMessage");
+                var wattpilotInfo = this.wattpilotInfo;
+                if (wattpilotInfo == null) {
+                    throw new IllegalStateException("No WattpilotInfo available");
+                }
+
                 AuthUtil.HashAlgorithm hash = AuthUtil.HashAlgorithm.PBKDF2;
                 if (arm.hash != null && !arm.hash.isBlank()) {
                     logger.debug("Wattpilot requested {} hash algorithm.", arm.hash);
@@ -674,7 +674,6 @@ public class WattpilotClient {
                         session.sendText(
                                 json,
                                 new Callback() {
-                                    @NonNullByDefault({})
                                     @Override
                                     public void fail(Throwable t) {
                                         logger.error("Could not send auth message", t);
@@ -688,7 +687,13 @@ public class WattpilotClient {
 
             if (m instanceof AuthSuccessMessage) {
                 logger.trace("Received AuthSuccessMessage");
-                logger.debug("Authenticated successfully with {}", wattpilotInfo.friendlyName());
+                var wattpilotInfo = this.wattpilotInfo;
+                if (wattpilotInfo != null) {
+                    logger.debug(
+                            "Authenticated successfully with {}", wattpilotInfo.friendlyName());
+                } else {
+                    logger.warn("Authenticated successfully");
+                }
                 authenticated = true;
                 onConnected(WebSocketConnection.this);
             }
