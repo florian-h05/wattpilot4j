@@ -186,6 +186,7 @@ public class WattpilotClient {
             }
             session = connection.getSession();
             if (session == null || !session.isOpen()) {
+                onDisconnected(connection, "Disconnected before connection completed", null);
                 return CompletableFuture.completedFuture(null);
             }
             disconnectFuture = this.disconnectFuture;
@@ -643,7 +644,10 @@ public class WattpilotClient {
                 logger.trace("Received AuthRequiredMessage");
                 var wattpilotInfo = this.wattpilotInfo;
                 if (wattpilotInfo == null) {
-                    throw new IllegalStateException("No WattpilotInfo available");
+                    onDisconnected(
+                            this,
+                            "Entered illegal state while connecting",
+                            new IOException("Received AuthRequiredMessage before HelloMessage"));
                 }
 
                 AuthUtil.HashAlgorithm hash = AuthUtil.HashAlgorithm.PBKDF2;
