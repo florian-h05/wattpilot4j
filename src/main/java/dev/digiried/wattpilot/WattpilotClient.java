@@ -104,7 +104,9 @@ public class WattpilotClient {
     private boolean isInitialized = false;
     private byte[] hashedPassword = new byte[0];
     private @Nullable WattpilotInfo wattpilotInfo;
-    private int requestCounter = 0;
+
+    private final Object sendCommandLock = new Object();
+    private volatile int requestCounter = 0;
 
     /**
      * Create a new Fronius Wattpilot client using the given {@link HttpClient}.
@@ -240,27 +242,34 @@ public class WattpilotClient {
             throw new IllegalStateException("Client is not connected");
         }
 
-        SetValueMessage setValueMessage = SetValueMessage.fromCommand(requestCounter, command);
-        var wattpilotInfo = this.wattpilotInfo;
-        if (wattpilotInfo != null && !wattpilotInfo.secured()) {
-            logger.trace("Sending SetValueMessage");
-            return sendOutgoingMessage(String.valueOf(setValueMessage.requestId), setValueMessage);
-        }
+        // Synchronize to guarantee strict ordering of counter-increment AND transmission
+        synchronized (sendCommandLock) {
+            int requestCounter = this.requestCounter;
 
-        String data = gson.toJson(setValueMessage);
-        String hmac;
-        try {
-            hmac = AuthUtil.createHmac(hashedPassword, data);
-        } catch (NoSuchAlgorithmException e) {
-            logger.error("Could not send command: Failed to create HMAC", e);
-            CompletableFuture<CommandResponse> future = new CompletableFuture<>();
-            future.completeExceptionally(new IOException("Failed to create HMAC", e));
-            return future;
+            SetValueMessage setValueMessage = SetValueMessage.fromCommand(requestCounter, command);
+            var wattpilotInfo = this.wattpilotInfo;
+            if (wattpilotInfo != null && !wattpilotInfo.secured()) {
+                logger.trace("Sending SetValueMessage");
+                this.requestCounter++;
+                return sendOutgoingMessage(
+                        String.valueOf(setValueMessage.requestId), setValueMessage);
+            }
+
+            String data = gson.toJson(setValueMessage);
+            String hmac;
+            try {
+                hmac = AuthUtil.createHmac(hashedPassword, data);
+            } catch (NoSuchAlgorithmException e) {
+                logger.error("Could not send command: Failed to create HMAC", e);
+                CompletableFuture<CommandResponse> future = new CompletableFuture<>();
+                future.completeExceptionally(new IOException("Failed to create HMAC", e));
+                return future;
+            }
+            SecuredMessage securedMessage = new SecuredMessage(data, requestCounter + "sm", hmac);
+            logger.trace("Sending SecuredMessage");
+            this.requestCounter++;
+            return sendOutgoingMessage(String.valueOf(setValueMessage.requestId), securedMessage);
         }
-        SecuredMessage securedMessage = new SecuredMessage(data, requestCounter + "sm", hmac);
-        requestCounter++;
-        logger.trace("Sending SecuredMessage");
-        return sendOutgoingMessage(String.valueOf(setValueMessage.requestId), securedMessage);
     }
 
     /**
